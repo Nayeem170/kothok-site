@@ -29,7 +29,7 @@ export function StickyBar() {
     >
       <div className="mx-auto mb-4 flex w-[calc(100%-2rem)] max-w-3xl items-center justify-between gap-4 rounded-full border border-ink/10 bg-paper/90 px-5 py-2.5 shadow-lg shadow-ink/10 backdrop-blur-md">
         <span className="truncate font-display text-sm font-semibold tracking-tight text-ink">
-          KoThok <span className="text-eink-500">— Read · Listen · Anywhere</span>
+          KoThok <span className="text-eink-500">- Read · Listen · Anywhere</span>
         </span>
         <DownloadButton label="Get it" className="px-5 py-2.5" />
       </div>

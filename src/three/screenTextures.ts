@@ -40,7 +40,7 @@ const CHAPTERS = [
   "The Selfish Giant",
   "The Devoted Friend",
   "The Remarkable Rocket",
-  "Appendix — Notes",
+  "Appendix - Notes",
 ];
 
 function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
@@ -91,7 +91,7 @@ function wrapClamp(
   for (const word of text.split(" ")) {
     const test = line ? line + " " + word : word;
     if (ctx.measureText(test).width > maxW && line) {
-      ctx.fillText(n === maxLines ? line + "…" : line, x, yy);
+      ctx.fillText(n === maxLines ? line + "..." : line, x, yy);
       if (n === maxLines) return yy + lh;
       line = word;
       yy += lh;
@@ -129,7 +129,7 @@ function centerWrap(
   const shown = lines.slice(0, maxLines);
   if (lines.length > maxLines) {
     const last = shown[maxLines - 1];
-    shown[maxLines - 1] = last.slice(0, Math.max(0, last.length - 1)) + "…";
+    shown[maxLines - 1] = last.slice(0, Math.max(0, last.length - 1)) + "...";
   }
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
@@ -213,7 +213,7 @@ function drawButton(
     ctx.textAlign = "left";
     ctx.fillText(label, x + 16, y + h / 2);
     ctx.textAlign = "right";
-    ctx.fillText(o.value + "  ›", x + w - 16, y + h / 2);
+    ctx.fillText(o.value + "  >", x + w - 16, y + h / 2);
   } else {
     ctx.textAlign = "center";
     ctx.fillText(label, x + w / 2, y + h / 2 + 1);
@@ -244,7 +244,7 @@ function drawSliderRow(
   resetText(ctx);
 
   const yy = y + 36;
-  drawButton(ctx, x, yy, 96, 56, "−", { fontSize: 40 });
+  drawButton(ctx, x, yy, 96, 56, "-", { fontSize: 40 });
   const tx = x + 96 + 14;
   const tw = w - (96 + 14) * 2;
   ctx.fillStyle = "#dcdcdc";
@@ -470,7 +470,7 @@ function drawMenu(ctx: CanvasRenderingContext2D) {
   let y = pad;
 
   drawButton(ctx, pad, y, 160, 56, "Library");
-  drawButton(ctx, pad + 160 + 12, y, 170, 56, "↩ Reading", { fontSize: 22 });
+  drawButton(ctx, pad + 160 + 12, y, 170, 56, "Reading", { fontSize: 22 });
   ctx.fillStyle = UI.ink;
   ctx.font = "22px Arial, sans-serif";
   ctx.textAlign = "center";

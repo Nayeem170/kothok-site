@@ -16,7 +16,7 @@ export function About() {
           <Reveal delay={0.1}>
             <p className="mt-6 text-lg leading-relaxed text-eink-700">
               KoThok is a reader you install on a Kobo e-reader. While you read,
-              it takes over the screen — showing your library, chapters, and pages
+              it takes over the screen - showing your library, chapters, and pages
               on colour e-ink. Tap once more and the same book is spoken through a
               Bluetooth speaker, in a voice chosen for its language.
             </p>
