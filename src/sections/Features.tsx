@@ -95,7 +95,8 @@ export function Features() {
                     <FeaturePhoto
                       state={feature.state}
                       alt={feature.title}
-                      className="w-full aspect-[3/4] object-cover scale-[1.8]"
+                      className="w-full aspect-[3/4] object-cover"
+                      style={{ transform: "scale(1.8)", transformOrigin: "center" }}
                     />
                   </button>
                 </div>
