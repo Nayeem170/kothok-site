@@ -37,8 +37,7 @@ export function Device({ textures, theme, reducedMotion }: DeviceProps) {
 
   useFrame((state) => {
     const t = state.clock.elapsedTime;
-    let idx: number;
-    idx = Math.floor(t / 3.6) % SCREEN_ORDER.length;
+    const idx = Math.floor(t / 3.6) % SCREEN_ORDER.length;
 
     if (idx !== activeIdx.current && screenMat.current) {
       activeIdx.current = idx;
