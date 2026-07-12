@@ -20,11 +20,9 @@ type DeviceProps = {
   textures: Record<ScreenState, THREE.CanvasTexture>;
   theme: Theme;
   reducedMotion: boolean;
-  progressRef?: React.MutableRefObject<number>;
-  autoCycle?: boolean;
 };
 
-export function Device({ textures, theme, reducedMotion, progressRef, autoCycle = false }: DeviceProps) {
+export function Device({ textures, theme, reducedMotion }: DeviceProps) {
   const group = useRef<THREE.Group>(null);
   const screenMat = useRef<THREE.MeshBasicMaterial>(null);
   const flashMat = useRef<THREE.MeshBasicMaterial>(null);
@@ -39,13 +37,7 @@ export function Device({ textures, theme, reducedMotion, progressRef, autoCycle 
 
   useFrame((state) => {
     const t = state.clock.elapsedTime;
-    let idx: number;
-    if (autoCycle) {
-      idx = Math.floor(t / 3.6) % SCREEN_ORDER.length;
-    } else {
-      const p = progressRef?.current ?? 0;
-      idx = p < 0.2 ? 0 : p < 0.4 ? 1 : p < 0.6 ? 2 : p < 0.8 ? 3 : 4;
-    }
+    const idx = Math.floor(t / 3.6) % SCREEN_ORDER.length;
 
     if (idx !== activeIdx.current && screenMat.current) {
       activeIdx.current = idx;
@@ -68,7 +60,12 @@ export function Device({ textures, theme, reducedMotion, progressRef, autoCycle 
   return (
     <group ref={group}>
       <RoundedBox args={[2.3, 3.28, 0.2]} radius={0.09} smoothness={8}>
-        <meshStandardMaterial ref={bodyMat} color={BODY_COLOR[theme]} roughness={0.32} metalness={0.12} />
+        <meshStandardMaterial
+          ref={bodyMat}
+          color={BODY_COLOR[theme]}
+          roughness={0.32}
+          metalness={0.12}
+        />
       </RoundedBox>
 
       <mesh position={[0, 0, 0.102]}>
@@ -78,7 +75,13 @@ export function Device({ textures, theme, reducedMotion, progressRef, autoCycle 
 
       <mesh position={[0, 0, 0.104]}>
         <planeGeometry args={[1.86, 2.48]} />
-        <meshBasicMaterial ref={flashMat} color="#FFFFFF" transparent opacity={0} toneMapped={false} />
+        <meshBasicMaterial
+          ref={flashMat}
+          color="#FFFFFF"
+          transparent
+          opacity={0}
+          toneMapped={false}
+        />
       </mesh>
 
       <mesh position={[0, -1.45, 0.103]}>

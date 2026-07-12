@@ -1,29 +1,12 @@
 {
   "repo": {
-    "main": "https://github.com/Nayeem170/KoThok",
-    "releases": "https://github.com/Nayeem170/KoThok/releases",
-    "changelog": "https://github.com/Nayeem170/KoThok/blob/main/CHANGELOG.md"
-  },
-  "download": {
-    "binary": "https://github.com/Nayeem170/KoThok/releases/download/v0.1.0/kothok-0.1.0",
-    "latest": "https://github.com/Nayeem170/KoThok/releases/latest/download/kothok-0.1.0"
+    "main": "https://github.com/Nayeem170/KoThok"
   },
   "installer": {
-    "page": "https://github.com/Nayeem170/KoThok/tree/main/installer",
-    "windows": "https://raw.githubusercontent.com/Nayeem170/KoThok/main/installer/install.bat",
-    "macos": "https://raw.githubusercontent.com/Nayeem170/KoThok/main/installer/install.command",
-    "linux": "https://raw.githubusercontent.com/Nayeem170/KoThok/main/installer/install.sh",
-    "powershell": "https://raw.githubusercontent.com/Nayeem170/KoThok/main/installer/install.ps1"
+    "page": "https://github.com/Nayeem170/KoThok/tree/main/installer"
   },
   "crates": {
     "koboCore": "https://crates.io/crates/kobo-core",
     "edgeTts": "https://crates.io/crates/kothok-edge-tts"
-  },
-  "docs": {
-    "koboCore": "https://docs.rs/kobo-core",
-    "edgeTts": "https://docs.rs/kothok-edge-tts"
-  },
-  "assets": {
-    "samples": "samples/"
   }
 }

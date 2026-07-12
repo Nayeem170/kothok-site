@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense } from "react";
 import type { Theme } from "../three/Device";
 import { Reveal } from "../components/Reveal";
 import { SamplePlayer } from "../components/SamplePlayer";
@@ -15,28 +15,19 @@ export function Hero({
   reducedMotion: boolean;
   enhanced: boolean;
 }) {
-  const [isDesktop, setIsDesktop] = useState(
-    typeof window !== "undefined" ? window.innerWidth >= 768 : true
-  );
-  useEffect(() => {
-    const onResize = () => setIsDesktop(window.innerWidth >= 768);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
-
-  const showDevice = enhanced && isDesktop;
+  const showDevice = enhanced;
 
   return (
-    <section className="relative flex min-h-screen items-center">
-      {showDevice && (
-        <div className="pointer-events-none absolute right-0 top-0 z-0 hidden h-full md:block md:w-1/2 lg:w-[55%]">
-          <Suspense fallback={null}>
-            <HeroStage theme={theme} reducedMotion={reducedMotion} className="h-full w-full" />
-          </Suspense>
-        </div>
-      )}
+    <section className="relative min-h-screen overflow-hidden">
+      <div className="mx-auto grid min-h-screen w-full max-w-6xl grid-cols-1 items-center gap-8 px-6 pt-28 pb-16 md:grid-cols-2 md:gap-12 md:px-12 md:pt-20">
+        {showDevice && (
+          <div className="pointer-events-none order-first flex h-[40vh] items-center justify-center md:order-last md:h-[80vh]">
+            <Suspense fallback={null}>
+              <HeroStage theme={theme} reducedMotion={reducedMotion} className="h-full w-full" />
+            </Suspense>
+          </div>
+        )}
 
-      <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pt-28 pb-20 md:px-12">
         <div className="max-w-xl">
           <Reveal>
             <p className="eyebrow mb-5">For Kobo e-readers</p>
@@ -44,18 +35,16 @@ export function Hero({
           <Reveal delay={0.05}>
             <h1 className="font-display text-display font-bold text-ink">
               <span className="text-kothokred">Read</span>
-              <span className="text-eink-300"> ·</span>
               <br />
               <span className="text-kothokgreen">Listen</span>
-              <span className="text-eink-300"> ·</span>
               <br />
               Anywhere
             </h1>
           </Reveal>
           <Reveal delay={0.12}>
             <p className="mt-6 max-w-md text-lg leading-relaxed text-eink-700">
-              Open a book and KoThok reads it aloud to you over Bluetooth — or
-              settle in and read it yourself on the colour e-ink screen.
+              Open a book and KoThok reads it aloud to you over Bluetooth - or settle in and read it
+              yourself on the e-ink screen.
             </p>
           </Reveal>
 
@@ -70,7 +59,7 @@ export function Hero({
                 href="#about"
                 className="font-mono text-sm uppercase tracking-[0.16em] text-eink-500 transition-colors hover:text-ink"
               >
-                See how it works →
+                See how it works
               </a>
             </div>
           </Reveal>
