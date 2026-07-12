@@ -14,17 +14,17 @@ const FEATURES: Feature[] = [
   },
   {
     title: "Read in colour",
-    body: "Your books show in colour on the e-ink screen — covers, chapters, and pictures included.",
+    body: "Your books show in colour on the e-ink screen - covers, chapters, and pictures included.",
     mark: "red",
   },
   {
     title: "Reads any language",
-    body: "Arabic, Bangla, Hindi, Thai, Chinese and more — each shown and spoken in its own voice.",
+    body: "Arabic, Bangla, Hindi, Thai, Chinese and more - each shown and spoken in its own voice.",
     mark: "grey",
   },
   {
     title: "Remembers you",
-    body: "Your page, brightness, and chosen voice are saved — even after sleep or a font-size change.",
+    body: "Your page, brightness, and chosen voice are saved - even after sleep or a font-size change.",
     mark: "grey",
   },
 ];
