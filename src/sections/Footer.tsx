@@ -14,7 +14,7 @@ export function Footer() {
               </span>
             </div>
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-eink-500">
-              A reader for Kobo e-ink devices. Read your books in colour, or let
+              A reader for Kobo e-ink devices. Read your books, or let
               them be read aloud.
             </p>
           </div>
