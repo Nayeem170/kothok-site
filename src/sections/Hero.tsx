@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense } from "react";
 import type { Theme } from "../three/Device";
 import { Reveal } from "../components/Reveal";
 import { SamplePlayer } from "../components/SamplePlayer";
@@ -15,28 +15,19 @@ export function Hero({
   reducedMotion: boolean;
   enhanced: boolean;
 }) {
-  const [isDesktop, setIsDesktop] = useState(
-    typeof window !== "undefined" ? window.innerWidth >= 768 : true
-  );
-  useEffect(() => {
-    const onResize = () => setIsDesktop(window.innerWidth >= 768);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
-
-  const showDevice = enhanced && isDesktop;
+  const showDevice = enhanced;
 
   return (
-    <section className="relative flex min-h-screen items-center">
+    <section className="relative flex min-h-screen flex-col md:flex-row md:items-center">
       {showDevice && (
-        <div className="pointer-events-none absolute right-0 top-0 z-0 hidden h-full md:block md:w-1/2 lg:w-[55%]">
+        <div className="pointer-events-none z-0 mt-20 h-[34vh] w-full sm:h-[38vh] md:absolute md:right-0 md:top-0 md:m-0 md:h-full md:w-1/2 lg:w-[55%]">
           <Suspense fallback={null}>
             <HeroStage theme={theme} reducedMotion={reducedMotion} className="h-full w-full" />
           </Suspense>
         </div>
       )}
 
-      <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pt-28 pb-20 md:px-12">
+      <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pt-3 pb-16 md:px-12 md:py-20">
         <div className="max-w-xl">
           <Reveal>
             <p className="eyebrow mb-5">For Kobo e-readers</p>
@@ -54,7 +45,7 @@ export function Hero({
           </Reveal>
           <Reveal delay={0.12}>
             <p className="mt-6 max-w-md text-lg leading-relaxed text-eink-700">
-              Open a book and KoThok reads it aloud to you over Bluetooth — or
+              Open a book and KoThok reads it aloud to you over Bluetooth - or
               settle in and read it yourself on the colour e-ink screen.
             </p>
           </Reveal>
@@ -70,7 +61,7 @@ export function Hero({
                 href="#about"
                 className="font-mono text-sm uppercase tracking-[0.16em] text-eink-500 transition-colors hover:text-ink"
               >
-                See how it works →
+                See how it works
               </a>
             </div>
           </Reveal>
