@@ -18,16 +18,16 @@ export function Hero({
   const showDevice = enhanced;
 
   return (
-    <section className="relative flex min-h-screen flex-col md:flex-row md:items-center">
-      {showDevice && (
-        <div className="pointer-events-none z-0 mt-20 h-[34vh] w-full sm:h-[38vh] md:absolute md:right-0 md:top-0 md:m-0 md:h-full md:w-1/2 lg:w-[55%]">
-          <Suspense fallback={null}>
-            <HeroStage theme={theme} reducedMotion={reducedMotion} className="h-full w-full" />
-          </Suspense>
-        </div>
-      )}
+    <section className="relative min-h-screen overflow-hidden">
+      <div className="mx-auto grid min-h-screen w-full max-w-6xl grid-cols-1 items-center gap-8 px-6 pt-28 pb-16 md:grid-cols-2 md:gap-12 md:px-12 md:pt-20">
+        {showDevice && (
+          <div className="pointer-events-none order-first flex h-[40vh] items-center justify-center md:order-last md:h-[80vh]">
+            <Suspense fallback={null}>
+              <HeroStage theme={theme} reducedMotion={reducedMotion} className="h-full w-full" />
+            </Suspense>
+          </div>
+        )}
 
-      <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pt-3 pb-16 md:px-12 md:py-20">
         <div className="max-w-xl">
           <Reveal>
             <p className="eyebrow mb-5">For Kobo e-readers</p>
@@ -46,7 +46,7 @@ export function Hero({
           <Reveal delay={0.12}>
             <p className="mt-6 max-w-md text-lg leading-relaxed text-eink-700">
               Open a book and KoThok reads it aloud to you over Bluetooth - or
-              settle in and read it yourself on the colour e-ink screen.
+              settle in and read it yourself on the e-ink screen.
             </p>
           </Reveal>
 
