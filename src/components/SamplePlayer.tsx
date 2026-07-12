@@ -109,7 +109,9 @@ export function SamplePlayer() {
 
       <div className="min-w-0 flex-1">
         <div className="mb-2 flex items-baseline gap-2">
-          <span className="font-mono text-xs uppercase tracking-[0.16em] text-ink">Hear a sample</span>
+          <span className="font-mono text-xs uppercase tracking-[0.16em] text-ink">
+            Hear a sample
+          </span>
           <span className="text-xs text-eink-500">· {active.label}</span>
         </div>
 

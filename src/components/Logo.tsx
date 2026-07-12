@@ -1,12 +1,6 @@
 export function Logo({ className = "" }: { className?: string }) {
   return (
-    <svg
-      className={className}
-      viewBox="332 415 600 600"
-      role="img"
-      aria-label="KoThok"
-      fill="none"
-    >
+    <svg className={className} viewBox="332 415 600 600" role="img" aria-label="KoThok" fill="none">
       <g transform="translate(362, 380)">
         <rect x="0" y="75" width="150" height="520" rx="75" ry="75" fill="#F42A41" />
         <path

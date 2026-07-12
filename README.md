@@ -33,4 +33,3 @@ npm run preview
 - [kothok-edge-tts](https://crates.io/crates/kothok-edge-tts) (TTS client)
 
 MIT
-

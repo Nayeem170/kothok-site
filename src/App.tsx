@@ -22,8 +22,7 @@ function supportsWebGL(): boolean {
 
 function prefersReducedMotion(): boolean {
   return (
-    typeof window !== "undefined" &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
   );
 }
 
@@ -36,12 +35,30 @@ function ThemeToggle({ theme, onToggle }: { theme: Theme; onToggle: () => void }
       className="flex h-8 w-8 items-center justify-center rounded-full text-eink-500 transition-colors hover:text-ink"
     >
       {isDark ? (
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+          width="17"
+          height="17"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
           <circle cx="12" cy="12" r="4" />
           <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
         </svg>
       ) : (
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+          width="17"
+          height="17"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
         </svg>
       )}
@@ -55,9 +72,7 @@ function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void
       <nav className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4 md:px-12">
         <a href="#top" className="flex items-center gap-2.5">
           <Logo className="h-6 w-6" />
-          <span className="font-display text-lg font-semibold tracking-tight text-ink">
-            KoThok
-          </span>
+          <span className="font-display text-lg font-semibold tracking-tight text-ink">KoThok</span>
         </a>
         <div className="flex items-center gap-3 font-mono text-xs uppercase tracking-[0.16em] text-eink-500 sm:gap-6">
           <a href="#about" className="link-underline hidden hover:text-ink min-[400px]:inline">
@@ -80,7 +95,7 @@ export default function App() {
   const [theme, setTheme] = useState<Theme>(() =>
     typeof document !== "undefined" && document.documentElement.classList.contains("dark")
       ? "dark"
-      : "light"
+      : "light",
   );
 
   useEffect(() => {
