@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { Reveal } from "../components/Reveal";
-import { DeviceImage } from "../components/DeviceImage";
+import { FeaturePhoto } from "../components/FeaturePhoto";
 import { FeatureLightbox } from "../components/FeatureLightbox";
 import type { ScreenState } from "../images";
 
@@ -92,10 +92,10 @@ export function Features() {
                     aria-label={`Enlarge ${feature.title} image`}
                     className={`block w-full cursor-zoom-in md:col-span-3 ${isReversed ? "md:order-1" : ""}`}
                   >
-                    <DeviceImage
+                    <FeaturePhoto
                       state={feature.state}
                       alt={feature.title}
-                      className="mx-auto w-full max-w-[300px]"
+                      className="w-full rounded-2xl shadow-2xl ring-1 ring-black/10 aspect-[3/4] object-cover"
                     />
                   </button>
                 </div>
