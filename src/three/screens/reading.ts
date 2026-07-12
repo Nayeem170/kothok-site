@@ -4,7 +4,7 @@ import { UI, drawFooter } from "./widgets";
 const BODY = [
   "One night there flew over the city a little Swallow. His friends had gone away to Egypt six weeks before, but he had stayed behind, for he was in love with the most beautiful Reed.",
   "He had met her early in the spring as he was flying down the river after a big yellow moth, and had been so attracted by her slender waist that he had stopped to talk to her.",
-  "“Shall I love you?” said the Swallow, who liked to come to the point at once, and the Reed made him a low bow. So he flew round and round her, and made silver ripples.",
+  '"Shall I love you?" said the Swallow, who liked to come to the point at once, and the Reed made him a low bow. So he flew round and round her, and made silver ripples.',
 ];
 
 export function drawReading(ctx: CanvasRenderingContext2D, playing: boolean) {
@@ -26,5 +26,5 @@ export function drawReading(ctx: CanvasRenderingContext2D, playing: boolean) {
     y = wrap(ctx, p, padX, y, SW - 2 * padX, 52);
     y += 26;
   }
-  drawFooter(ctx, playing, playing ? "Reading aloud · 2:14" : "Page 7 of 142");
+  drawFooter(ctx, playing, playing ? "Reading aloud - 2:14" : "Page 7 of 142");
 }

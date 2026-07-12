@@ -112,7 +112,7 @@ export function SamplePlayer() {
           <span className="font-mono text-xs uppercase tracking-[0.16em] text-ink">
             Hear a sample
           </span>
-          <span className="text-xs text-eink-500">· {active.label}</span>
+          <span className="text-xs text-eink-500">- {active.label}</span>
         </div>
 
         <ProgressBar progress={progress} />

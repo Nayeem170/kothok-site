@@ -16,25 +16,25 @@ const FEATURES: Feature[] = [
     title: "Read aloud",
     body: "Natural-sounding voices read your book to you over a Bluetooth speaker, pausing like a person would.",
     state: "readAloud",
-    screen: "screen · read aloud",
+    screen: "screen - read aloud",
   },
   {
     title: "Reads EPUB books",
     body: "Open your EPUB books on the Kobo and read them page by page on the e-ink screen.",
     state: "reading",
-    screen: "screen · reading",
+    screen: "screen - reading",
   },
   {
     title: "Your library",
     body: "All your books in one place - open one to read, or tap to hear it read aloud.",
     state: "library",
-    screen: "screen · library",
+    screen: "screen - library",
   },
   {
     title: "Voice & speed",
     body: "Pick a natural-sounding voice that suits the book and a playback speed to match.",
     state: "settings",
-    screen: "screen · settings",
+    screen: "screen - settings",
   },
 ];
 

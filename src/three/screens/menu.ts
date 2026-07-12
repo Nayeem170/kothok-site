@@ -72,6 +72,6 @@ export function drawMenu(ctx: CanvasRenderingContext2D) {
   iy += 28;
   ctx.fillStyle = "#666666";
   ctx.font = "18px Arial, sans-serif";
-  wrap(ctx, "swipe: pages · swipe down: menu · double-tap: play", pad, iy, infoW, 24);
+  wrap(ctx, "swipe: pages - swipe down: menu - double-tap: play", pad, iy, infoW, 24);
   resetText(ctx);
 }

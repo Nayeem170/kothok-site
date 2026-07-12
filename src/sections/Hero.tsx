@@ -35,10 +35,8 @@ export function Hero({
           <Reveal delay={0.05}>
             <h1 className="font-display text-display font-bold text-ink">
               <span className="text-kothokred">Read</span>
-              <span className="text-eink-300"> ·</span>
               <br />
               <span className="text-kothokgreen">Listen</span>
-              <span className="text-eink-300"> ·</span>
               <br />
               Anywhere
             </h1>
