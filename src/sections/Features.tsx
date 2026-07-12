@@ -39,20 +39,20 @@ const FEATURES: Feature[] = [
 ];
 
 export function Features() {
-  const [zoom, setZoom] = useState<Feature | null>(null);
-  const [fullSize, setFullSize] = useState(false);
+  const [active, setActive] = useState<Feature | null>(null);
+  const [isFullSize, setIsFullSize] = useState(false);
 
   const open = useCallback((feature: Feature) => {
-    setZoom(feature);
-    setFullSize(false);
+    setActive(feature);
+    setIsFullSize(false);
   }, []);
 
   const close = useCallback(() => {
-    setZoom(null);
-    setFullSize(false);
+    setActive(null);
+    setIsFullSize(false);
   }, []);
 
-  const toggleSize = useCallback(() => setFullSize((v) => !v), []);
+  const toggleSize = useCallback(() => setIsFullSize((v) => !v), []);
 
   return (
     <section className="relative py-24 md:py-32">
@@ -68,11 +68,11 @@ export function Features() {
 
         <div className="mt-20 flex flex-col gap-24 md:gap-32">
           {FEATURES.map((feature, i) => {
-            const flip = i % 2 === 1;
+            const isReversed = i % 2 === 1;
             return (
               <Reveal key={feature.title}>
                 <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-5 md:gap-16">
-                  <div className={`md:col-span-2 ${flip ? "md:order-2" : ""}`}>
+                  <div className={`md:col-span-2 ${isReversed ? "md:order-2" : ""}`}>
                     <p className="mb-3 font-mono text-xs uppercase tracking-[0.16em] text-kothokgreen">
                       {feature.screen}
                     </p>
@@ -86,7 +86,7 @@ export function Features() {
                     type="button"
                     onClick={() => open(feature)}
                     aria-label={`Enlarge ${feature.title} image`}
-                    className={`block w-full cursor-zoom-in rounded-2xl md:col-span-3 ${flip ? "md:order-1" : ""}`}
+                    className={`block w-full cursor-zoom-in rounded-2xl md:col-span-3 ${isReversed ? "md:order-1" : ""}`}
                   >
                     <FeaturePhoto
                       state={feature.state}
@@ -101,8 +101,8 @@ export function Features() {
         </div>
       </div>
 
-      {zoom && (
-        <FeatureLightbox feature={zoom} fullSize={fullSize} onToggleSize={toggleSize} onClose={close} />
+      {active && (
+        <FeatureLightbox feature={active} isFullSize={isFullSize} onToggleSize={toggleSize} onClose={close} />
       )}
     </section>
   );

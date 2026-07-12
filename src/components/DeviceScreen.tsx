@@ -2,12 +2,12 @@ import type { ReactNode } from "react";
 import type { ScreenState } from "../images";
 
 const BOOKS = [
-  { t: "The Happy Prince", a: "Oscar Wilde", c: "from-[#0e7a64] to-[#0a5645]" },
-  { t: "Pride & Prejudice", a: "Jane Austen", c: "from-[#b23a4e] to-[#7c2436]" },
-  { t: "Frankenstein", a: "Mary Shelley", c: "from-[#3b4358] to-[#20253a]" },
-  { t: "Alice's Adventures", a: "Lewis Carroll", c: "from-[#6a4ca0] to-[#46306f]" },
-  { t: "The Jungle Book", a: "Rudyard Kipling", c: "from-[#b5872e] to-[#856219]" },
-  { t: "Treasure Island", a: "R.L. Stevenson", c: "from-[#1f5f8b] to-[#13486c]" },
+  { title: "The Happy Prince", author: "Oscar Wilde", gradient: "from-[#0e7a64] to-[#0a5645]" },
+  { title: "Pride & Prejudice", author: "Jane Austen", gradient: "from-[#b23a4e] to-[#7c2436]" },
+  { title: "Frankenstein", author: "Mary Shelley", gradient: "from-[#3b4358] to-[#20253a]" },
+  { title: "Alice's Adventures", author: "Lewis Carroll", gradient: "from-[#6a4ca0] to-[#46306f]" },
+  { title: "The Jungle Book", author: "Rudyard Kipling", gradient: "from-[#b5872e] to-[#856219]" },
+  { title: "Treasure Island", author: "R.L. Stevenson", gradient: "from-[#1f5f8b] to-[#13486c]" },
 ];
 
 const READING_LINES = ["w-full", "w-11/12", "w-full", "w-4/5", "w-full", "w-3/4", "w-full", "w-5/6"];
@@ -37,11 +37,11 @@ function LibraryScreen() {
         <span className="font-mono text-[0.6rem] text-eink-500">6 books</span>
       </div>
       <div className="grid flex-1 grid-cols-2 gap-2 overflow-hidden">
-        {BOOKS.map((b, i) => (
-          <div key={b.t} className={`relative flex flex-col justify-between overflow-hidden rounded-md bg-gradient-to-br ${b.c} p-2`}>
+        {BOOKS.map((book, i) => (
+          <div key={book.title} className={`relative flex flex-col justify-between overflow-hidden rounded-md bg-gradient-to-br ${book.gradient} p-2`}>
             <span className="absolute left-0 top-0 h-full w-1 bg-black/25" />
-            <span className="text-[0.62rem] font-semibold leading-tight text-white/95">{b.t}</span>
-            <span className="truncate text-[0.5rem] uppercase tracking-wide text-white/70">{b.a}</span>
+            <span className="text-[0.62rem] font-semibold leading-tight text-white/95">{book.title}</span>
+            <span className="truncate text-[0.5rem] uppercase tracking-wide text-white/70">{book.author}</span>
             {i === 0 && <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-kothokred ring-2 ring-white/80" />}
           </div>
         ))}
@@ -60,8 +60,8 @@ function ReadingScreen() {
       <div className="mb-0.5 font-mono text-[0.55rem] uppercase tracking-wide text-eink-500">Chapter 3</div>
       <h4 className="font-display text-base font-semibold text-ink">The Selfish Giant</h4>
       <div className="mt-3 flex flex-col gap-1.5">
-        {READING_LINES.map((w, i) => (
-          <div key={i} className={`h-1.5 rounded bg-[#d8d4ca] ${w}`} />
+        {READING_LINES.map((width, i) => (
+          <div key={i} className={`h-1.5 rounded bg-reading-line ${width}`} />
         ))}
       </div>
       <div className="mt-auto flex items-center justify-between border-t border-ink/10 pt-2">
@@ -79,8 +79,8 @@ function ReadAloudScreen() {
     <div className="relative flex h-full flex-col p-4">
       <h4 className="font-display text-base font-semibold text-ink">The Selfish Giant</h4>
       <div className="mt-3 flex flex-col gap-1.5">
-        {READING_LINES.slice(0, 5).map((w, i) => (
-          <div key={i} className={`h-1.5 rounded bg-[#d8d4ca] ${w}`} />
+        {READING_LINES.slice(0, 5).map((width, i) => (
+          <div key={i} className={`h-1.5 rounded bg-reading-line ${width}`} />
         ))}
       </div>
       <div className="mt-auto rounded-xl border border-ink/10 bg-ink/[0.03] p-3">
@@ -89,8 +89,8 @@ function ReadAloudScreen() {
             <PlayIcon className="ml-0.5 h-3 w-3" />
           </span>
           <div className="flex h-5 flex-1 items-center gap-0.5">
-            {WAVE.map((h, i) => (
-              <span key={i} className="flex-1 rounded-full bg-kothokgreen/80" style={{ height: `${h}px` }} />
+            {WAVE.map((height, i) => (
+              <span key={i} className="flex-1 rounded-full bg-kothokgreen/80" style={{ height: `${height}px` }} />
             ))}
           </div>
           <span className="font-mono text-[0.55rem] text-eink-500">0:42</span>
@@ -157,20 +157,12 @@ export function DeviceFrame({ children, className = "" }: { children: ReactNode;
   return (
     <div className={`${className} relative`}>
       <div className="absolute -bottom-4 left-1/2 h-5 w-3/4 -translate-x-1/2 rounded-[100%] bg-black/20 blur-lg" />
-      <div className="relative aspect-[3/4] w-full rounded-[22px] bg-gradient-to-b from-[#2b2b30] to-[#0e0e12] p-2.5 shadow-2xl ring-1 ring-black/40">
-        <div className="relative h-full w-full overflow-hidden rounded-[14px] bg-[#f3f0e8]">
+      <div className="relative aspect-[3/4] w-full rounded-[22px] bg-gradient-to-b from-bezel-from to-bezel-to p-2.5 shadow-2xl ring-1 ring-black/40">
+        <div className="relative h-full w-full overflow-hidden rounded-[14px] bg-screen">
           {children}
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-transparent" />
         </div>
       </div>
     </div>
-  );
-}
-
-export function DeviceScreen({ state, className = "" }: { state: ScreenState; className?: string }) {
-  return (
-    <DeviceFrame className={className}>
-      <ScreenContent state={state} />
-    </DeviceFrame>
   );
 }
