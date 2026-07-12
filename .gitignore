@@ -13,3 +13,6 @@ package-lock.json
 
 # Local-only code conventions (not tracked)
 docs/CODE_CONVENTIONS.md
+
+# Local-only agent instructions (not tracked)
+AGENTS.md
