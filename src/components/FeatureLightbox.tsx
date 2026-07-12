@@ -85,8 +85,8 @@ export function FeatureLightbox({
       </button>
 
       <div className="pointer-events-none absolute bottom-4 inset-x-0 text-center font-mono text-[0.7rem] uppercase tracking-[0.16em] text-white/60">
-        {feature.title} ·{" "}
-        {isFullSize ? "scroll to read · click image to fit" : "click image for full size"}
+        {feature.title} -{" "}
+        {isFullSize ? "scroll to read - click image to fit" : "click image for full size"}
       </div>
     </div>
   );

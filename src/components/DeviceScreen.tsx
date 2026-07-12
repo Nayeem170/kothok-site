@@ -129,7 +129,7 @@ function ReadAloudScreen() {
           <span className="font-mono text-[0.55rem] text-eink-500">0:42</span>
         </div>
         <div className="mt-1.5 flex justify-between font-mono text-[0.5rem] text-eink-500">
-          <span>English · Ava</span>
+          <span>English - Ava</span>
           <span>1.0x</span>
         </div>
       </div>
@@ -163,7 +163,7 @@ function SettingsScreen() {
         <div className="flex items-center justify-between rounded-lg border border-ink/10 px-2.5 py-2">
           <span className="text-[0.6rem] text-eink-700">Voice</span>
           <span className="flex items-center gap-1 font-mono text-[0.55rem] text-kothokgreen">
-            English · Ava <Chevron className="h-2.5 w-2.5" />
+            English - Ava <Chevron className="h-2.5 w-2.5" />
           </span>
         </div>
         <div className="flex items-center justify-between rounded-lg border border-ink/10 px-2.5 py-2">

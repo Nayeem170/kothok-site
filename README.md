@@ -1,8 +1,7 @@
 # KoThok Site
 
-Landing page for [KoThok](https://github.com/Nayeem170/KoThok), a custom e-reader
-app for Kobo e-ink devices. Read EPUBs in colour, or have them read aloud over
-Bluetooth.
+Landing page for [KoThok](https://github.com/Nayeem170/KoThok), a reader app for
+Kobo e-ink devices. Read EPUBs, or have them read aloud over Bluetooth.
 
 Built with **Vite + React + TypeScript**, **React Three Fiber** (three.js) for
 the 3D device, **Framer Motion** for scroll reveals, and **Tailwind CSS**.
