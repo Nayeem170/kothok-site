@@ -40,7 +40,9 @@ export function drawMenu(ctx: CanvasRenderingContext2D) {
   y += gap;
   drawButton(ctx, pad, y, 220, 60, "Home WiFi", { fontSize: 20 });
   drawButton(ctx, pad + 220 + 16, y, 220, 60, "JBL Flip", { fontSize: 20 });
-  drawButton(ctx, pad + (220 + 16) * 2, y, innerW - (220 + 16) * 2, 60, "Chapters", { fontSize: 22 });
+  drawButton(ctx, pad + (220 + 16) * 2, y, innerW - (220 + 16) * 2, 60, "Chapters", {
+    fontSize: 22,
+  });
   y += 60 + gap;
 
   drawRule(ctx, pad, y, innerW);

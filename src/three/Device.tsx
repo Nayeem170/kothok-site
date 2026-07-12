@@ -60,7 +60,12 @@ export function Device({ textures, theme, reducedMotion }: DeviceProps) {
   return (
     <group ref={group}>
       <RoundedBox args={[2.3, 3.28, 0.2]} radius={0.09} smoothness={8}>
-        <meshStandardMaterial ref={bodyMat} color={BODY_COLOR[theme]} roughness={0.32} metalness={0.12} />
+        <meshStandardMaterial
+          ref={bodyMat}
+          color={BODY_COLOR[theme]}
+          roughness={0.32}
+          metalness={0.12}
+        />
       </RoundedBox>
 
       <mesh position={[0, 0, 0.102]}>
@@ -70,7 +75,13 @@ export function Device({ textures, theme, reducedMotion }: DeviceProps) {
 
       <mesh position={[0, 0, 0.104]}>
         <planeGeometry args={[1.86, 2.48]} />
-        <meshBasicMaterial ref={flashMat} color="#FFFFFF" transparent opacity={0} toneMapped={false} />
+        <meshBasicMaterial
+          ref={flashMat}
+          color="#FFFFFF"
+          transparent
+          opacity={0}
+          toneMapped={false}
+        />
       </mesh>
 
       <mesh position={[0, -1.45, 0.103]}>

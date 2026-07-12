@@ -21,9 +21,9 @@ export default {
         },
       },
       fontFamily: {
-        display: ['Fredoka', 'system-ui', 'sans-serif'],
-        body: ['Fredoka', 'system-ui', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+        display: ["Fredoka", "system-ui", "sans-serif"],
+        body: ["Fredoka", "system-ui", "sans-serif"],
+        mono: ['"JetBrains Mono"', "ui-monospace", "monospace"],
       },
       fontSize: {
         display: ["clamp(2.75rem, 8vw, 6rem)", { lineHeight: "0.98", letterSpacing: "-0.02em" }],

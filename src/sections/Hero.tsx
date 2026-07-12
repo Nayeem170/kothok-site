@@ -45,8 +45,8 @@ export function Hero({
           </Reveal>
           <Reveal delay={0.12}>
             <p className="mt-6 max-w-md text-lg leading-relaxed text-eink-700">
-              Open a book and KoThok reads it aloud to you over Bluetooth - or
-              settle in and read it yourself on the e-ink screen.
+              Open a book and KoThok reads it aloud to you over Bluetooth - or settle in and read it
+              yourself on the e-ink screen.
             </p>
           </Reveal>
 

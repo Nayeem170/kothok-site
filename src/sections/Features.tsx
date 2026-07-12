@@ -76,8 +76,12 @@ export function Features() {
                     <p className="mb-3 font-mono text-xs uppercase tracking-[0.16em] text-kothokgreen">
                       {feature.screen}
                     </p>
-                    <h3 className="font-display text-2xl font-semibold text-ink md:text-3xl">{feature.title}</h3>
-                    <p className="mt-3 max-w-md text-lg leading-relaxed text-eink-700">{feature.body}</p>
+                    <h3 className="font-display text-2xl font-semibold text-ink md:text-3xl">
+                      {feature.title}
+                    </h3>
+                    <p className="mt-3 max-w-md text-lg leading-relaxed text-eink-700">
+                      {feature.body}
+                    </p>
                     <p className="mt-4 font-mono text-xs uppercase tracking-[0.16em] text-eink-500">
                       Tap to enlarge
                     </p>
@@ -102,7 +106,12 @@ export function Features() {
       </div>
 
       {active && (
-        <FeatureLightbox feature={active} isFullSize={isFullSize} onToggleSize={toggleSize} onClose={close} />
+        <FeatureLightbox
+          feature={active}
+          isFullSize={isFullSize}
+          onToggleSize={toggleSize}
+          onClose={close}
+        />
       )}
     </section>
   );

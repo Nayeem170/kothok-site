@@ -10,7 +10,16 @@ const BOOKS = [
   { title: "Treasure Island", author: "R.L. Stevenson", gradient: "from-[#1f5f8b] to-[#13486c]" },
 ];
 
-const READING_LINES = ["w-full", "w-11/12", "w-full", "w-4/5", "w-full", "w-3/4", "w-full", "w-5/6"];
+const READING_LINES = [
+  "w-full",
+  "w-11/12",
+  "w-full",
+  "w-4/5",
+  "w-full",
+  "w-3/4",
+  "w-full",
+  "w-5/6",
+];
 const WAVE = [4, 8, 12, 7, 14, 10, 6, 13, 9, 5, 11, 7, 4, 9, 12, 6];
 
 function PlayIcon({ className = "" }: { className?: string }) {
@@ -23,7 +32,16 @@ function PlayIcon({ className = "" }: { className?: string }) {
 
 function Chevron({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
       <path d="M9 6l6 6-6 6" />
     </svg>
   );
@@ -38,11 +56,20 @@ function LibraryScreen() {
       </div>
       <div className="grid flex-1 grid-cols-2 gap-2 overflow-hidden">
         {BOOKS.map((book, i) => (
-          <div key={book.title} className={`relative flex flex-col justify-between overflow-hidden rounded-md bg-gradient-to-br ${book.gradient} p-2`}>
+          <div
+            key={book.title}
+            className={`relative flex flex-col justify-between overflow-hidden rounded-md bg-gradient-to-br ${book.gradient} p-2`}
+          >
             <span className="absolute left-0 top-0 h-full w-1 bg-black/25" />
-            <span className="text-[0.62rem] font-semibold leading-tight text-white/95">{book.title}</span>
-            <span className="truncate text-[0.5rem] uppercase tracking-wide text-white/70">{book.author}</span>
-            {i === 0 && <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-kothokred ring-2 ring-white/80" />}
+            <span className="text-[0.62rem] font-semibold leading-tight text-white/95">
+              {book.title}
+            </span>
+            <span className="truncate text-[0.5rem] uppercase tracking-wide text-white/70">
+              {book.author}
+            </span>
+            {i === 0 && (
+              <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-kothokred ring-2 ring-white/80" />
+            )}
           </div>
         ))}
       </div>
@@ -57,7 +84,9 @@ function LibraryScreen() {
 function ReadingScreen() {
   return (
     <div className="relative flex h-full flex-col p-4">
-      <div className="mb-0.5 font-mono text-[0.55rem] uppercase tracking-wide text-eink-500">Chapter 3</div>
+      <div className="mb-0.5 font-mono text-[0.55rem] uppercase tracking-wide text-eink-500">
+        Chapter 3
+      </div>
       <h4 className="font-display text-base font-semibold text-ink">The Selfish Giant</h4>
       <div className="mt-3 flex flex-col gap-1.5">
         {READING_LINES.map((width, i) => (
@@ -90,7 +119,11 @@ function ReadAloudScreen() {
           </span>
           <div className="flex h-5 flex-1 items-center gap-0.5">
             {WAVE.map((height, i) => (
-              <span key={i} className="flex-1 rounded-full bg-kothokgreen/80" style={{ height: `${height}px` }} />
+              <span
+                key={i}
+                className="flex-1 rounded-full bg-kothokgreen/80"
+                style={{ height: `${height}px` }}
+              />
             ))}
           </div>
           <span className="font-mono text-[0.55rem] text-eink-500">0:42</span>
@@ -153,7 +186,13 @@ export function ScreenContent({ state }: { state: ScreenState }) {
   );
 }
 
-export function DeviceFrame({ children, className = "" }: { children: ReactNode; className?: string }) {
+export function DeviceFrame({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
     <div className={`${className} relative`}>
       <div className="absolute -bottom-4 left-1/2 h-5 w-3/4 -translate-x-1/2 rounded-[100%] bg-black/20 blur-lg" />

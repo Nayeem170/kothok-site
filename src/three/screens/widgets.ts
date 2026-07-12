@@ -27,7 +27,7 @@ export function drawCoverArt(
   y: number,
   w: number,
   h: number,
-  book: { title: string; author: string; color: string }
+  book: { title: string; author: string; color: string },
 ) {
   ctx.save();
   roundRect(ctx, x, y, w, h, 6);
@@ -61,7 +61,13 @@ export function drawCoverArt(
   resetText(ctx);
 }
 
-export function drawProgressBar(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, frac: number) {
+export function drawProgressBar(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  frac: number,
+) {
   const h = 8;
   ctx.fillStyle = "#d0d0d0";
   roundRect(ctx, x, y, w, h, 4);
@@ -78,7 +84,7 @@ export function drawButton(
   w: number,
   h: number,
   label: string,
-  opts?: { value?: string; bg?: string; fontSize?: number; radius?: number }
+  opts?: { value?: string; bg?: string; fontSize?: number; radius?: number },
 ) {
   const o = opts || {};
   const bg = o.bg || UI.green;
@@ -114,7 +120,7 @@ export function drawSliderRow(
   w: number,
   name: string,
   value: string,
-  fill: number
+  fill: number,
 ) {
   ctx.fillStyle = UI.ink;
   ctx.font = "24px Arial, sans-serif";

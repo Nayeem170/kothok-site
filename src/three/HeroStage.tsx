@@ -38,7 +38,11 @@ export function HeroStage({
 
   return (
     <div className={className} style={{ pointerEvents: "none" }}>
-      <Canvas dpr={[1, dprMax]} camera={{ position: [0, 0.32, 6.6], fov: 38 }} gl={{ antialias: true, alpha: true }}>
+      <Canvas
+        dpr={[1, dprMax]}
+        camera={{ position: [0, 0.32, 6.6], fov: 38 }}
+        gl={{ antialias: true, alpha: true }}
+      >
         <ambientLight intensity={0.25} />
         <directionalLight position={[5, 8, 6]} intensity={1.3} />
         <directionalLight position={[-7, 4, -4]} intensity={1.1} color="#dceaff" />
@@ -51,7 +55,14 @@ export function HeroStage({
         </Environment>
 
         <Device theme={theme} reducedMotion={reducedMotion} textures={textures.current} />
-        <ContactShadows position={[0, -1.78, 0]} opacity={shadowOpacity} scale={7} blur={2.4} far={4} color={theme === "dark" ? "#000000" : "#0A0A0A"} />
+        <ContactShadows
+          position={[0, -1.78, 0]}
+          opacity={shadowOpacity}
+          scale={7}
+          blur={2.4}
+          far={4}
+          color={theme === "dark" ? "#000000" : "#0A0A0A"}
+        />
         <Particles theme={theme} reducedMotion={reducedMotion} />
         <IdleRig reducedMotion={reducedMotion} />
       </Canvas>

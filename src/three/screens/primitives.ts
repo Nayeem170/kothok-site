@@ -1,7 +1,14 @@
 export const SW = 1072;
 export const SH = 1448;
 
-export function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+export function roundRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+) {
   const rr = Math.min(r, w / 2, h / 2);
   ctx.beginPath();
   ctx.moveTo(x + rr, y);
@@ -17,7 +24,14 @@ export function resetText(ctx: CanvasRenderingContext2D) {
   ctx.textBaseline = "alphabetic";
 }
 
-export function wrap(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxW: number, lh: number) {
+export function wrap(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  maxW: number,
+  lh: number,
+) {
   let line = "";
   let yy = y;
   for (const word of text.split(" ")) {
@@ -41,7 +55,7 @@ export function wrapClamp(
   y: number,
   maxW: number,
   lh: number,
-  maxLines: number
+  maxLines: number,
 ): number {
   let line = "";
   let yy = y;
@@ -69,7 +83,7 @@ export function centerWrap(
   topY: number,
   maxW: number,
   lh: number,
-  maxLines: number
+  maxLines: number,
 ) {
   const words = text.split(" ");
   const lines: string[] = [];
