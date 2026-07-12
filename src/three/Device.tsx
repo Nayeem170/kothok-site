@@ -20,11 +20,9 @@ type DeviceProps = {
   textures: Record<ScreenState, THREE.CanvasTexture>;
   theme: Theme;
   reducedMotion: boolean;
-  progressRef?: React.MutableRefObject<number>;
-  autoCycle?: boolean;
 };
 
-export function Device({ textures, theme, reducedMotion, progressRef, autoCycle = false }: DeviceProps) {
+export function Device({ textures, theme, reducedMotion }: DeviceProps) {
   const group = useRef<THREE.Group>(null);
   const screenMat = useRef<THREE.MeshBasicMaterial>(null);
   const flashMat = useRef<THREE.MeshBasicMaterial>(null);
@@ -40,12 +38,7 @@ export function Device({ textures, theme, reducedMotion, progressRef, autoCycle 
   useFrame((state) => {
     const t = state.clock.elapsedTime;
     let idx: number;
-    if (autoCycle) {
-      idx = Math.floor(t / 3.6) % SCREEN_ORDER.length;
-    } else {
-      const p = progressRef?.current ?? 0;
-      idx = p < 0.2 ? 0 : p < 0.4 ? 1 : p < 0.6 ? 2 : p < 0.8 ? 3 : 4;
-    }
+    idx = Math.floor(t / 3.6) % SCREEN_ORDER.length;
 
     if (idx !== activeIdx.current && screenMat.current) {
       activeIdx.current = idx;

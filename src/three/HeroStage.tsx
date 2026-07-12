@@ -13,7 +13,7 @@ function IdleRig({ reducedMotion }: { reducedMotion: boolean }) {
   useFrame((state) => {
     const t = state.clock.elapsedTime;
     const angle = reducedMotion ? -0.25 : Math.sin(t * 0.22) * 0.5 - 0.2;
-    const radius = 6.6;
+    const radius = typeof window !== "undefined" && window.innerWidth < 768 ? 5.2 : 6.6;
     camera.position.set(Math.sin(angle) * radius, 0.32, Math.cos(angle) * radius);
     look.current.set(0, 0, 0);
     camera.lookAt(look.current);
@@ -34,10 +34,11 @@ export function HeroStage({
   const textures = useRef<Record<ScreenState, THREE.CanvasTexture> | null>(null);
   if (!textures.current) textures.current = buildScreenTextures();
   const shadowOpacity = theme === "dark" ? 0.5 : 0.4;
+  const dprMax = typeof window !== "undefined" && window.innerWidth < 768 ? 1.5 : 2;
 
   return (
     <div className={className} style={{ pointerEvents: "none" }}>
-      <Canvas dpr={[1, 2]} camera={{ position: [0, 0.32, 6.6], fov: 38 }} gl={{ antialias: true, alpha: true }}>
+      <Canvas dpr={[1, dprMax]} camera={{ position: [0, 0.32, 6.6], fov: 38 }} gl={{ antialias: true, alpha: true }}>
         <ambientLight intensity={0.25} />
         <directionalLight position={[5, 8, 6]} intensity={1.3} />
         <directionalLight position={[-7, 4, -4]} intensity={1.1} color="#dceaff" />
@@ -49,7 +50,7 @@ export function HeroStage({
           <Lightformer intensity={0.5} position={[0, -4, 2]} scale={[8, 3, 1]} />
         </Environment>
 
-        <Device autoCycle theme={theme} reducedMotion={reducedMotion} textures={textures.current} />
+        <Device theme={theme} reducedMotion={reducedMotion} textures={textures.current} />
         <ContactShadows position={[0, -1.78, 0]} opacity={shadowOpacity} scale={7} blur={2.4} far={4} color={theme === "dark" ? "#000000" : "#0A0A0A"} />
         <Particles theme={theme} reducedMotion={reducedMotion} />
         <IdleRig reducedMotion={reducedMotion} />
