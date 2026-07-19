@@ -9,7 +9,7 @@ const HeroStage = lazy(() => import("../three/HeroStage").then((m) => ({ default
 // Loaded eagerly as the reduced-motion / no-WebGL fallback, so it has to stay
 // small - the 8.4MB render this replaced was the LCP image for every visitor
 // who never reached the 3D stage.
-const POSTER_SRC = "/images/05-kitchen.jpg";
+const POSTER_SRC = `${import.meta.env.BASE_URL}images/05-kitchen.jpg`;
 
 export function Hero({
   theme,

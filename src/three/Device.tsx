@@ -63,7 +63,7 @@ function useScreenTextures() {
     Promise.all(
       SCREEN_STATES.map((state) =>
         loader
-          .loadAsync(`/screens/${state}.png`)
+          .loadAsync(`${import.meta.env.BASE_URL}screens/${state}.png`)
           .then((tex) => {
             tex.colorSpace = THREE.SRGBColorSpace;
             tex.anisotropy = 8;
