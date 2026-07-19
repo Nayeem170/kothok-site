@@ -16,3 +16,8 @@ docs/CODE_CONVENTIONS.md
 
 # Local-only agent instructions (not tracked)
 AGENTS.md
+
+# Full-resolution generated scene originals (~40MB). The JPEGs shipped from
+# public/images are derived from these; the originals stay local so a scene can
+# be re-encoded without being regenerated.
+design-source/

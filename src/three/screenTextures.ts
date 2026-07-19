@@ -1,41 +1,7 @@
 import * as THREE from "three";
-import { SW, SH } from "./screens/primitives";
-import { drawLibrary } from "./screens/library";
-import { drawReading } from "./screens/reading";
-import { drawChapters } from "./screens/chapters";
-import { drawMenu } from "./screens/menu";
 
-export type ScreenState = "library" | "reading" | "listening" | "chapters" | "menu";
-
-export const SCREEN_ORDER: ScreenState[] = ["library", "reading", "listening", "chapters", "menu"];
-
-function makeCanvas() {
-  const canvas = document.createElement("canvas");
-  canvas.width = SW;
-  canvas.height = SH;
-  return { canvas, ctx: canvas.getContext("2d")! };
-}
-
-function texFrom(draw: (ctx: CanvasRenderingContext2D) => void): THREE.CanvasTexture {
-  const { canvas, ctx } = makeCanvas();
-  draw(ctx);
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  tex.anisotropy = 8;
-  tex.needsUpdate = true;
-  return tex;
-}
-
-export function buildScreenTextures(): Record<ScreenState, THREE.CanvasTexture> {
-  return {
-    library: texFrom(drawLibrary),
-    reading: texFrom((c) => drawReading(c, false)),
-    listening: texFrom((c) => drawReading(c, true)),
-    chapters: texFrom(drawChapters),
-    menu: texFrom(drawMenu),
-  };
-}
-
+/// The "kobo" wordmark stamped on the bezel below the panel. The screen itself
+/// is textured from real device captures - see `Device.tsx`.
 export function makeKoboLogoTexture(color: string): THREE.CanvasTexture {
   const canvas = document.createElement("canvas");
   canvas.width = 320;

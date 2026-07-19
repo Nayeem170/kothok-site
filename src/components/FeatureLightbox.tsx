@@ -2,10 +2,43 @@ import { useEffect } from "react";
 import { FeaturePhoto } from "./FeaturePhoto";
 import type { ScreenState } from "../images";
 
-export type FeatureLightboxData = {
+type FeatureLightboxData = {
   title: string;
   state: ScreenState;
 };
+
+function CloseButton({ onClose }: { onClose: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClose}
+      aria-label="Close"
+      className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full bg-black/50 text-white ring-1 ring-white/25 transition-colors hover:bg-black/70"
+    >
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M6 6l12 12M18 6L6 18" />
+      </svg>
+    </button>
+  );
+}
+
+function LightboxCaption({ title, isFullSize }: { title: string; isFullSize: boolean }) {
+  return (
+    <div className="pointer-events-none absolute bottom-4 inset-x-0 text-center font-mono text-[0.7rem] uppercase tracking-[0.16em] text-white/60">
+      {title} -{" "}
+      {isFullSize ? "scroll to read - click image to fit" : "click image for full size"}
+    </div>
+  );
+}
 
 export function FeatureLightbox({
   feature,
@@ -64,30 +97,8 @@ export function FeatureLightbox({
         </div>
       </div>
 
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label="Close"
-        className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full bg-black/50 text-white ring-1 ring-white/25 transition-colors hover:bg-black/70"
-      >
-        <svg
-          width="22"
-          height="22"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M6 6l12 12M18 6L6 18" />
-        </svg>
-      </button>
-
-      <div className="pointer-events-none absolute bottom-4 inset-x-0 text-center font-mono text-[0.7rem] uppercase tracking-[0.16em] text-white/60">
-        {feature.title} -{" "}
-        {isFullSize ? "scroll to read - click image to fit" : "click image for full size"}
-      </div>
+      <CloseButton onClose={onClose} />
+      <LightboxCaption title={feature.title} isFullSize={isFullSize} />
     </div>
   );
 }

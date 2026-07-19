@@ -58,7 +58,7 @@ function LangChips({ code, onPick }: { code: string; onPick: (code: string) => v
   );
 }
 
-export function SamplePlayer() {
+function useSampleAudio() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const wantPlay = useRef(false);
   const [code, setCode] = useState("en");
@@ -95,6 +95,22 @@ export function SamplePlayer() {
     }
   }, [code]);
 
+  return {
+    audioRef,
+    active,
+    playing,
+    progress,
+    toggle,
+    pick,
+    onPlayingChange: setPlaying,
+    onProgressChange: setProgress,
+  };
+}
+
+export function SamplePlayer() {
+  const { audioRef, active, playing, progress, toggle, pick, onPlayingChange, onProgressChange } =
+    useSampleAudio();
+
   return (
     <div className="mt-8 flex items-center gap-4">
       <button
@@ -116,22 +132,22 @@ export function SamplePlayer() {
         </div>
 
         <ProgressBar progress={progress} />
-        <LangChips code={code} onPick={pick} />
+        <LangChips code={active.code} onPick={pick} />
       </div>
 
       <audio
         ref={audioRef}
         src={BASE + active.file}
         preload="none"
-        onPlay={() => setPlaying(true)}
-        onPause={() => setPlaying(false)}
+        onPlay={() => onPlayingChange(true)}
+        onPause={() => onPlayingChange(false)}
         onEnded={() => {
-          setPlaying(false);
-          setProgress(0);
+          onPlayingChange(false);
+          onProgressChange(0);
         }}
         onTimeUpdate={(e) => {
           const a = e.currentTarget;
-          setProgress(a.duration ? a.currentTime / a.duration : 0);
+          onProgressChange(a.duration ? a.currentTime / a.duration : 0);
         }}
       />
     </div>
