@@ -5,6 +5,7 @@ import { Hero } from "./sections/Hero";
 import { Features } from "./sections/Features";
 import { Compare } from "./sections/Compare";
 import { GetStarted } from "./sections/GetStarted";
+import { Feedback } from "./sections/Feedback";
 import { Footer } from "./sections/Footer";
 import { StickyBar } from "./components/StickyBar";
 
@@ -120,6 +121,7 @@ export default function App() {
         <Features />
         <Compare />
         <GetStarted />
+        <Feedback />
         <Footer />
       </main>
 
