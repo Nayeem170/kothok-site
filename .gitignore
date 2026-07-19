@@ -9,6 +9,9 @@ dist-ssr
 vite.config.js
 vite.config.d.ts
 
+# Secrets (never committed)
+.env
+
 # Local-only code conventions (not tracked)
 docs/CODE_CONVENTIONS.md
 
