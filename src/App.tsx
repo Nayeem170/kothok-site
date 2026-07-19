@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { Theme } from "./three/Device";
 import { Logo } from "./components/Logo";
 import { Hero } from "./sections/Hero";
-import { About } from "./sections/About";
 import { Features } from "./sections/Features";
+import { Compare } from "./sections/Compare";
 import { GetStarted } from "./sections/GetStarted";
 import { Footer } from "./sections/Footer";
 import { StickyBar } from "./components/StickyBar";
@@ -75,8 +75,8 @@ function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void
           <span className="font-display text-lg font-semibold tracking-tight text-ink">KoThok</span>
         </a>
         <div className="flex items-center gap-3 font-mono text-xs uppercase tracking-[0.16em] text-eink-500 sm:gap-6">
-          <a href="#about" className="link-underline hidden hover:text-ink min-[400px]:inline">
-            About
+          <a href="#features" className="link-underline hover:text-ink">
+            What it does
           </a>
           <a href="#get-started" className="link-underline hover:text-ink">
             Get it
@@ -90,18 +90,13 @@ function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void
 }
 
 export default function App() {
-  const [enhanced, setEnhanced] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
+  const enhanced = typeof window !== "undefined" && supportsWebGL();
+  const reducedMotion = typeof window !== "undefined" && prefersReducedMotion();
   const [theme, setTheme] = useState<Theme>(() =>
     typeof document !== "undefined" && document.documentElement.classList.contains("dark")
       ? "dark"
       : "light",
   );
-
-  useEffect(() => {
-    setEnhanced(supportsWebGL());
-    setReducedMotion(prefersReducedMotion());
-  }, []);
 
   const toggleTheme = () => {
     setTheme((prev) => {
@@ -122,10 +117,8 @@ export default function App() {
 
       <main>
         <Hero theme={theme} reducedMotion={reducedMotion} enhanced={enhanced} />
-        <div id="about">
-          <About />
-        </div>
         <Features />
+        <Compare />
         <GetStarted />
         <Footer />
       </main>
