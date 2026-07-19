@@ -1,10 +1,24 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { RoundedBox } from "@react-three/drei";
 import * as THREE from "three";
-import { SCREEN_ORDER, makeKoboLogoTexture, type ScreenState } from "./screenTextures";
+import { makeKoboLogoTexture } from "./screenTextures";
 
 export type Theme = "light" | "dark";
+
+/// Real captures off the device, not a replica. Refresh them by running a
+/// `--features screenshot` build of the reader and holding the header centre.
+const SCREEN_STATES = [
+  "splash",
+  "library",
+  "reading",
+  "audio",
+  "chapters",
+  "about",
+  "menu",
+] as const;
+
+export type ScreenState = (typeof SCREEN_STATES)[number];
 
 const BODY_COLOR: Record<Theme, string> = {
   light: "#1E2229",
@@ -16,20 +30,94 @@ const KOBO_COLOR: Record<Theme, string> = {
   dark: "#7c7c77",
 };
 
+// The panel is 1072x1448. Deriving the plane from that keeps the stills
+// pixel-proportional; the previous 1792/2400 guess overflowed the screen.
+const PANEL_W = 1072;
+const PANEL_H = 1448;
+const SCREEN_H = 2.48;
+const SCREEN_W = SCREEN_H * (PANEL_W / PANEL_H);
+
+const SCREEN_ORDER: { state: ScreenState; dwell: number }[] = [
+  { state: "splash", dwell: 2.4 },
+  { state: "library", dwell: 3.6 },
+  { state: "reading", dwell: 4.0 },
+  { state: "audio", dwell: 4.0 },
+  { state: "chapters", dwell: 3.2 },
+  { state: "about", dwell: 3.2 },
+  { state: "menu", dwell: 3.6 },
+  { state: "reading", dwell: 4.0 },
+  { state: "library", dwell: 3.0 },
+];
+
+/// Loads every still up front so a screen change never lands on an empty plane.
+/// Imperative rather than drei's `useTexture` because the Canvas has no Suspense
+/// boundary - suspending here would blank the whole hero.
+function useScreenTextures() {
+  const [textures, setTextures] = useState<Partial<Record<ScreenState, THREE.Texture>>>({});
+
+  useEffect(() => {
+    const loader = new THREE.TextureLoader();
+    let cancelled = false;
+    const loaded: THREE.Texture[] = [];
+
+    Promise.all(
+      SCREEN_STATES.map((state) =>
+        loader
+          .loadAsync(`/screens/${state}.png`)
+          .then((tex) => {
+            tex.colorSpace = THREE.SRGBColorSpace;
+            tex.anisotropy = 8;
+            tex.generateMipmaps = true;
+            tex.minFilter = THREE.LinearMipmapLinearFilter;
+            loaded.push(tex);
+            return [state, tex] as const;
+          })
+          // One missing still must not take the other five down with it.
+          .catch(() => null),
+      ),
+    ).then((entries) => {
+      if (cancelled) {
+        loaded.forEach((t) => t.dispose());
+        return;
+      }
+      const next: Partial<Record<ScreenState, THREE.Texture>> = {};
+      for (const entry of entries) {
+        if (entry) next[entry[0]] = entry[1];
+      }
+      setTextures(next);
+    });
+
+    return () => {
+      cancelled = true;
+      loaded.forEach((t) => t.dispose());
+    };
+  }, []);
+
+  return textures;
+}
+
+const FLASH_DURATION_SEC = 0.4;
+const FLASH_PEAK_OPACITY = 0.4;
+const FLOAT_SPEED = 0.6;
+const FLOAT_AMPLITUDE = 0.05;
+const SWAY_SPEED = 0.4;
+const SWAY_AMPLITUDE = 0.01;
+
 type DeviceProps = {
-  textures: Record<ScreenState, THREE.CanvasTexture>;
   theme: Theme;
   reducedMotion: boolean;
 };
 
-export function Device({ textures, theme, reducedMotion }: DeviceProps) {
+export function Device({ theme, reducedMotion }: DeviceProps) {
   const group = useRef<THREE.Group>(null);
-  const screenMat = useRef<THREE.MeshBasicMaterial>(null);
-  const flashMat = useRef<THREE.MeshBasicMaterial>(null);
   const bodyMat = useRef<THREE.MeshStandardMaterial>(null);
+  const flashMat = useRef<THREE.MeshBasicMaterial>(null);
   const activeIdx = useRef(0);
+  const cycleStart = useRef(0);
   const flashAt = useRef(-10);
+  const [, forceTick] = useState(0);
   const koboTex = useMemo(() => makeKoboLogoTexture(KOBO_COLOR[theme]), [theme]);
+  const screens = useScreenTextures();
 
   useEffect(() => {
     if (bodyMat.current) bodyMat.current.color.set(BODY_COLOR[theme]);
@@ -37,25 +125,32 @@ export function Device({ textures, theme, reducedMotion }: DeviceProps) {
 
   useFrame((state) => {
     const t = state.clock.elapsedTime;
-    const idx = Math.floor(t / 3.6) % SCREEN_ORDER.length;
+    const elapsed = t - cycleStart.current;
+    const def = SCREEN_ORDER[activeIdx.current];
 
-    if (idx !== activeIdx.current && screenMat.current) {
-      activeIdx.current = idx;
-      screenMat.current.map = textures[SCREEN_ORDER[idx]];
-      screenMat.current.needsUpdate = true;
+    if (elapsed >= def.dwell) {
+      activeIdx.current = (activeIdx.current + 1) % SCREEN_ORDER.length;
+      cycleStart.current = t;
+      forceTick((x) => x + 1);
       if (!reducedMotion) flashAt.current = t;
     }
 
     if (flashMat.current && !reducedMotion) {
       const since = t - flashAt.current;
-      flashMat.current.opacity = since < 0.45 ? 0.5 * (1 - since / 0.45) : 0;
+      flashMat.current.opacity =
+        since < FLASH_DURATION_SEC
+          ? FLASH_PEAK_OPACITY * (1 - since / FLASH_DURATION_SEC)
+          : 0;
     }
 
     if (group.current && !reducedMotion) {
-      group.current.position.y = Math.sin(t * 0.6) * 0.05;
-      group.current.rotation.z = Math.sin(t * 0.4) * 0.01;
+      group.current.position.y = Math.sin(t * FLOAT_SPEED) * FLOAT_AMPLITUDE;
+      group.current.rotation.z = Math.sin(t * SWAY_SPEED) * SWAY_AMPLITUDE;
     }
   });
+
+  const current = SCREEN_ORDER[activeIdx.current].state;
+  const screenTex = screens[current] ?? null;
 
   return (
     <group ref={group}>
@@ -69,12 +164,33 @@ export function Device({ textures, theme, reducedMotion }: DeviceProps) {
       </RoundedBox>
 
       <mesh position={[0, 0, 0.102]}>
-        <planeGeometry args={[1.86, 2.48]} />
-        <meshBasicMaterial ref={screenMat} map={textures.library} toneMapped={false} />
+        <planeGeometry args={[SCREEN_W, SCREEN_H]} />
+        {/* Keyed on the texture: three only compiles a map into the shader when
+            the material is built, so swapping `map` in later leaves the panel
+            blank. Remounting the material forces the recompile.
+            Paper-white until the stills land, so it never flashes black. */}
+        <meshStandardMaterial
+          key={screenTex ? screenTex.uuid : "blank"}
+          map={screenTex}
+          color="#FCFCFC"
+          roughness={0.9}
+        />
       </mesh>
 
-      <mesh position={[0, 0, 0.104]}>
-        <planeGeometry args={[1.86, 2.48]} />
+      <mesh position={[0, 0, 0.108]}>
+        <planeGeometry args={[SCREEN_W, SCREEN_H]} />
+        <meshPhysicalMaterial
+          transparent
+          opacity={0.05}
+          roughness={0.15}
+          clearcoat={0.9}
+          clearcoatRoughness={0.2}
+          reflectivity={0.4}
+        />
+      </mesh>
+
+      <mesh position={[0, 0, 0.11]}>
+        <planeGeometry args={[SCREEN_W, SCREEN_H]} />
         <meshBasicMaterial
           ref={flashMat}
           color="#FFFFFF"
@@ -86,7 +202,14 @@ export function Device({ textures, theme, reducedMotion }: DeviceProps) {
 
       <mesh position={[0, -1.45, 0.103]}>
         <planeGeometry args={[0.5, 0.14]} />
-        <meshBasicMaterial map={koboTex} transparent toneMapped={false} />
+        <meshStandardMaterial
+          map={koboTex}
+          emissive="#ffffff"
+          emissiveMap={koboTex}
+          emissiveIntensity={0.4}
+          roughness={0.7}
+          transparent
+        />
       </mesh>
     </group>
   );

@@ -28,6 +28,9 @@ export function FeaturePhoto({
     );
   }
 
+  // No srcSet here: the candidates are successive fallbacks, not formats of one
+  // image. Deriving a srcSet from them would let the last-resort screenshot
+  // override `src` and render the bare UI instead of the scene.
   return (
     <img
       src={candidates[index]}

@@ -1,48 +1,37 @@
 import { useCallback, useState } from "react";
-import { Reveal } from "../components/Reveal";
+import { Reveal, STAGGER } from "../components/Reveal";
 import { FeaturePhoto } from "../components/FeaturePhoto";
 import { FeatureLightbox } from "../components/FeatureLightbox";
-import type { ScreenState } from "../images";
+import { FEATURES } from "../content/features";
+import type { FeatureCell, SpecChip } from "../content/features";
 
-type Feature = {
-  title: string;
-  body: string;
-  state: ScreenState;
-  screen: string;
-};
-
-const FEATURES: Feature[] = [
-  {
-    title: "Read aloud",
-    body: "Natural-sounding voices read your book to you over a Bluetooth speaker, pausing like a person would.",
-    state: "readAloud",
-    screen: "screen - read aloud",
-  },
-  {
-    title: "Reads EPUB books",
-    body: "Open your EPUB books on the Kobo and read them page by page on the e-ink screen.",
-    state: "reading",
-    screen: "screen - reading",
-  },
-  {
-    title: "Your library",
-    body: "All your books in one place - open one to read, or tap to hear it read aloud.",
-    state: "library",
-    screen: "screen - library",
-  },
-  {
-    title: "Voice & speed",
-    body: "Pick a natural-sounding voice that suits the book and a playback speed to match.",
-    state: "settings",
-    screen: "screen - settings",
-  },
-];
+function ChipRow({ chips }: { chips: SpecChip[] }) {
+  return (
+    <div className="mt-4 flex flex-wrap gap-2">
+      {chips.map((chip) => (
+        <span
+          key={chip.label}
+          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-mono text-[11px] uppercase tracking-[0.1em] ${
+            chip.tone === "key"
+              ? "bg-kothokgreen/10 text-kothokgreen"
+              : chip.tone === "caveat"
+                ? "bg-amber-500/10 text-amber-700 dark:text-amber-400"
+                : "bg-ink/5 text-eink-500"
+          }`}
+        >
+          <span className="opacity-60">{chip.label}</span>
+          <span className="font-medium">{chip.value}</span>
+        </span>
+      ))}
+    </div>
+  );
+}
 
 export function Features() {
-  const [active, setActive] = useState<Feature | null>(null);
+  const [active, setActive] = useState<FeatureCell | null>(null);
   const [isFullSize, setIsFullSize] = useState(false);
 
-  const open = useCallback((feature: Feature) => {
+  const open = useCallback((feature: FeatureCell) => {
     setActive(feature);
     setIsFullSize(false);
   }, []);
@@ -55,51 +44,49 @@ export function Features() {
   const toggleSize = useCallback(() => setIsFullSize((v) => !v), []);
 
   return (
-    <section className="relative py-24 md:py-32">
+    <section id="features" className="relative py-24 md:py-32">
       <div className="mx-auto w-full max-w-6xl px-6 md:px-12">
         <Reveal>
           <p className="eyebrow mb-5 text-center">What it does</p>
         </Reveal>
-        <Reveal delay={0.05}>
+        <Reveal delay={STAGGER.lead}>
           <h2 className="mx-auto max-w-2xl text-center font-display text-h2 font-semibold leading-tight text-ink">
-            Built around the page and the voice.
+            Read it, listen to it, or both at once.
           </h2>
         </Reveal>
 
-        <div className="mt-20 flex flex-col gap-24 md:gap-32">
+        <div className="mt-16 grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
           {FEATURES.map((feature, i) => {
-            const isReversed = i % 2 === 1;
+            // An odd count would leave a hole in a two-column grid, so the last
+            // card widens to close the row instead.
+            const wide = i === FEATURES.length - 1 && FEATURES.length % 2 === 1;
             return (
-              <Reveal key={feature.title}>
-                <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-5 md:gap-16">
-                  <div className={`md:col-span-2 ${isReversed ? "md:order-2" : ""}`}>
-                    <p className="mb-3 font-mono text-xs uppercase tracking-[0.16em] text-kothokgreen">
-                      {feature.screen}
-                    </p>
-                    <h3 className="font-display text-2xl font-semibold text-ink md:text-3xl">
-                      {feature.title}
-                    </h3>
-                    <p className="mt-3 max-w-md text-lg leading-relaxed text-eink-700">
-                      {feature.body}
-                    </p>
-                    <p className="mt-4 font-mono text-xs uppercase tracking-[0.16em] text-eink-500">
-                      Tap to enlarge
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => open(feature)}
-                    aria-label={`Enlarge ${feature.title} image`}
-                    className={`block w-full cursor-zoom-in overflow-hidden rounded-2xl shadow-2xl ring-1 ring-black/10 md:col-span-3 ${isReversed ? "md:order-1" : ""}`}
+              <Reveal key={feature.id} className={wide ? "md:col-span-2" : ""}>
+                <button
+                  type="button"
+                  onClick={() => open(feature)}
+                  aria-label={`Enlarge ${feature.title} image`}
+                  className="group flex h-full w-full cursor-zoom-in flex-col overflow-hidden rounded-2xl bg-ink/[0.02] text-left shadow-lg ring-1 ring-black/5"
+                >
+                  <div
+                    className={`relative overflow-hidden ${
+                      wide ? "aspect-[3/4] md:aspect-[21/9]" : "aspect-[3/4]"
+                    }`}
                   >
                     <FeaturePhoto
                       state={feature.state}
                       alt={feature.title}
-                      className="w-full aspect-[3/4] object-cover"
-                      style={{ transform: "scale(1.8)", transformOrigin: "center" }}
+                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                     />
-                  </button>
-                </div>
+                  </div>
+                  <div className="p-6">
+                    <h3 className="font-display text-xl font-semibold text-ink md:text-2xl">
+                      {feature.title}
+                    </h3>
+                    <p className="mt-2 text-base leading-relaxed text-eink-700">{feature.line}</p>
+                    <ChipRow chips={feature.chips} />
+                  </div>
+                </button>
               </Reveal>
             );
           })}
