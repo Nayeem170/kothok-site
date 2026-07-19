@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { RoundedBox } from "@react-three/drei";
 import * as THREE from "three";
 import { makeKoboLogoTexture } from "./screenTextures";
@@ -52,7 +52,7 @@ const SCREEN_ORDER: { state: ScreenState; dwell: number }[] = [
 /// Loads every still up front so a screen change never lands on an empty plane.
 /// Imperative rather than drei's `useTexture` because the Canvas has no Suspense
 /// boundary - suspending here would blank the whole hero.
-function useScreenTextures() {
+function useScreenTextures(maxAniso: number) {
   const [textures, setTextures] = useState<Partial<Record<ScreenState, THREE.Texture>>>({});
 
   useEffect(() => {
@@ -66,7 +66,7 @@ function useScreenTextures() {
           .loadAsync(`${import.meta.env.BASE_URL}screens/${state}.png`)
           .then((tex) => {
             tex.colorSpace = THREE.SRGBColorSpace;
-            tex.anisotropy = 8;
+            tex.anisotropy = maxAniso;
             tex.generateMipmaps = true;
             tex.minFilter = THREE.LinearMipmapLinearFilter;
             loaded.push(tex);
@@ -116,8 +116,9 @@ export function Device({ theme, reducedMotion }: DeviceProps) {
   const cycleStart = useRef(0);
   const flashAt = useRef(-10);
   const [, forceTick] = useState(0);
-  const koboTex = useMemo(() => makeKoboLogoTexture(KOBO_COLOR[theme]), [theme]);
-  const screens = useScreenTextures();
+  const maxAniso = useThree((s) => s.gl).capabilities.getMaxAnisotropy();
+  const koboTex = useMemo(() => makeKoboLogoTexture(KOBO_COLOR[theme], maxAniso), [theme, maxAniso]);
+  const screens = useScreenTextures(maxAniso);
 
   useEffect(() => {
     if (bodyMat.current) bodyMat.current.color.set(BODY_COLOR[theme]);
@@ -174,6 +175,7 @@ export function Device({ theme, reducedMotion }: DeviceProps) {
           map={screenTex}
           color="#FCFCFC"
           roughness={0.9}
+          toneMapped={false}
         />
       </mesh>
 
