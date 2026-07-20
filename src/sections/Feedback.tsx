@@ -5,8 +5,12 @@ import { Reveal, STAGGER } from "../components/Reveal";
 const WEB3FORMS_KEY = "651486d1-94e9-43df-8d78-56b6b47b8e7b";
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/ykdvs21g/image/upload";
 const UPLOAD_PRESET = "uaezvf1b";
-const MAX_BYTES = 2 * 1024 * 1024;
-const MAX_DIM = 1920;
+
+const MAX_DIM = 2000;
+const QUALITY = 0.82;
+const QUALITY_FALLBACK = 0.66;
+const SOFT_MAX = 1.5 * 1024 * 1024;
+const HARD_MAX = 25 * 1024 * 1024;
 
 type Status = "idle" | "submitting" | "success" | "error";
 
@@ -18,41 +22,54 @@ const LABEL = "mb-1.5 block font-mono text-xs uppercase tracking-[0.14em] text-e
 const FILE =
   "block w-full cursor-pointer text-sm text-eink-500 file:mr-4 file:cursor-pointer file:rounded-full file:border-0 file:bg-ink file:px-5 file:py-2.5 file:font-mono file:text-xs file:uppercase file:tracking-[0.14em] file:text-paper transition-opacity hover:file:opacity-85";
 
-function formatSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+// Only raster images. SVG is rejected on purpose - it can carry scripts and is
+// not a photo. Anything without an image/* MIME type is rejected outright.
+function isAllowedImage(file: File): boolean {
+  const type = (file.type || "").toLowerCase();
+  if (type === "image/svg+xml") return false;
+  return type.startsWith("image/");
 }
 
-// Downscale large phone photos before uploading so it stays fast on mobile data.
-// createImageBitmap with imageOrientation applies the phone's EXIF rotation so
-// the snapshot isn't sideways. Falls back to the original on any failure.
+// Decodes the file as a raster image (throws if it is not really an image, so a
+// renamed script/HTML can never get through) and re-encodes it as a compact
+// JPEG. The long edge is capped so a screenshot stays legible while the upload
+// stays small; EXIF rotation is applied so phone photos aren't sideways.
 async function shrinkImage(file: File): Promise<Blob> {
-  try {
-    const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
-    let { width, height } = bitmap;
-    if (width > MAX_DIM || height > MAX_DIM) {
-      const scale = MAX_DIM / Math.max(width, height);
-      width = Math.round(width * scale);
-      height = Math.round(height * scale);
-    }
-    const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return file;
-    ctx.drawImage(bitmap, 0, 0, width, height);
-    bitmap.close();
-    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.8));
-    return blob ?? file;
-  } catch {
-    return file;
+  const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+  let { width, height } = bitmap;
+  if (width > MAX_DIM || height > MAX_DIM) {
+    const scale = MAX_DIM / Math.max(width, height);
+    width = Math.round(width * scale);
+    height = Math.round(height * scale);
   }
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas unavailable");
+  ctx.drawImage(bitmap, 0, 0, width, height);
+  bitmap.close();
+  let blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", QUALITY));
+  if (blob && blob.size > SOFT_MAX) {
+    blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", QUALITY_FALLBACK));
+  }
+  if (!blob) throw new Error("Encoding failed");
+  return blob;
 }
 
-async function uploadToCloudinary(blob: Blob, name: string): Promise<string> {
+async function uploadToCloudinary(file: File): Promise<string> {
+  let body: Blob;
+  try {
+    body = await shrinkImage(file);
+  } catch {
+    // Browser couldn't decode (rare, e.g. some HEIC in Chrome). Fall back to the
+    // original - Cloudinary re-validates and rejects anything that isn't a real
+    // image, so a disguised non-image still can't be stored.
+    body = file;
+  }
   const form = new FormData();
-  form.append("file", blob, name);
+  const baseName = file.name.replace(/\.[^.]+$/, "") || "photo";
+  form.append("file", body, `${baseName}.jpg`);
   form.append("upload_preset", UPLOAD_PRESET);
   const res = await fetch(CLOUDINARY_URL, { method: "POST", body: form });
   const json = (await res.json()) as { secure_url?: string; error?: { message?: string } };
@@ -69,17 +86,26 @@ export function Feedback() {
   const [photoName, setPhotoName] = useState("");
   const [photoBusy, setPhotoBusy] = useState(false);
 
+  function resetPhoto() {
+    setPhotoUrl(null);
+    setPhotoName("");
+  }
+
   async function handlePhoto(e: ChangeEvent<HTMLInputElement>) {
     const file = e.currentTarget.files?.[0];
     if (!file) {
-      setPhotoUrl(null);
-      setPhotoName("");
+      resetPhoto();
       return;
     }
-    if (!file.type.startsWith("image/")) {
-      setPhotoUrl(null);
-      setPhotoName("");
-      setErrorMsg("Please choose an image file.");
+    if (!isAllowedImage(file)) {
+      resetPhoto();
+      setErrorMsg("Please choose an image (JPG, PNG, WebP, or GIF). Other file types aren't allowed.");
+      setStatus("error");
+      return;
+    }
+    if (file.size > HARD_MAX) {
+      resetPhoto();
+      setErrorMsg("That image is over 25 MB. Please choose a smaller one.");
       setStatus("error");
       return;
     }
@@ -87,14 +113,12 @@ export function Feedback() {
     setErrorMsg("");
     setStatus("idle");
     try {
-      const blob = file.size > MAX_BYTES ? await shrinkImage(file) : file;
-      const url = await uploadToCloudinary(blob, file.name);
+      const url = await uploadToCloudinary(file);
       setPhotoUrl(url);
       setPhotoName(file.name);
     } catch {
-      setPhotoUrl(null);
-      setPhotoName("");
-      setErrorMsg("Photo upload failed. Try a smaller image or remove it.");
+      resetPhoto();
+      setErrorMsg("That file couldn't be read as an image. Please choose a valid photo.");
       setStatus("error");
     } finally {
       setPhotoBusy(false);
@@ -118,6 +142,7 @@ export function Feedback() {
           name: data.get("name"),
           email: data.get("email"),
           message: data.get("message"),
+          botcheck: data.get("botcheck") ?? "",
           ...(photoUrl ? { photo: photoUrl } : {}),
         }),
       });
@@ -125,8 +150,7 @@ export function Feedback() {
       if (json.success) {
         setStatus("success");
         form.reset();
-        setPhotoUrl(null);
-        setPhotoName("");
+        resetPhoto();
       } else {
         setStatus("error");
         setErrorMsg(typeof json.message === "string" ? json.message : "Submission failed. Try again.");
@@ -218,7 +242,7 @@ export function Feedback() {
                     Photo (optional)
                   </label>
                   <p className="mb-1.5 text-sm text-eink-500">
-                    Snap the screen if there's a bug to show. Photos over {formatSize(MAX_BYTES)} are auto-resized.
+                    Snap the screen if there's a bug to show. Images only (JPG, PNG, WebP, GIF) - auto-resized.
                   </p>
                   <input id="fb-photo" type="file" accept="image/*" onChange={handlePhoto} className={FILE} />
                   {photoBusy && <p className="mt-1.5 text-sm text-eink-500">Uploading photo...</p>}
