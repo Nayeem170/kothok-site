@@ -1,9 +1,8 @@
 import { useState } from "react";
-import type { FormEvent } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import { Reveal, STAGGER } from "../components/Reveal";
 
-const ACCESS_KEY = "28cc7a0f-8527-413c-9693-7b9dd3b35e7e";
-const ENDPOINT = "https://api.web3forms.com/submit";
+const ENDPOINT = "https://formsubmit.co/ajax/kothok@bitops.bd";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
@@ -12,9 +11,13 @@ const FIELD =
 
 const LABEL = "mb-1.5 block font-mono text-xs uppercase tracking-[0.14em] text-eink-500";
 
+const FILE =
+  "block w-full cursor-pointer text-sm text-eink-500 file:mr-4 file:cursor-pointer file:rounded-full file:border-0 file:bg-ink file:px-5 file:py-2.5 file:font-mono file:text-xs file:uppercase file:tracking-[0.14em] file:text-paper transition-opacity hover:file:opacity-85";
+
 export function Feedback() {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const [photoName, setPhotoName] = useState("");
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -25,20 +28,15 @@ export function Feedback() {
     try {
       const res = await fetch(ENDPOINT, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({
-          access_key: ACCESS_KEY,
-          subject: "KoThok site feedback",
-          from_name: "KoThok site",
-          name: data.get("name"),
-          email: data.get("email"),
-          message: data.get("message"),
-        }),
+        headers: { Accept: "application/json" },
+        body: data,
       });
-      const json = (await res.json()) as { success: boolean; message?: string };
-      if (json.success) {
+      const json = (await res.json()) as { success?: string | boolean; message?: string };
+      const ok = json.success === true || json.success === "true";
+      if (ok) {
         setStatus("success");
         form.reset();
+        setPhotoName("");
       } else {
         setStatus("error");
         setErrorMsg(typeof json.message === "string" ? json.message : "Submission failed. Try again.");
@@ -47,6 +45,10 @@ export function Feedback() {
       setStatus("error");
       setErrorMsg("Network error. Check your connection and try again.");
     }
+  }
+
+  function handlePhoto(e: ChangeEvent<HTMLInputElement>) {
+    setPhotoName(e.currentTarget.files?.[0]?.name ?? "");
   }
 
   return (
@@ -83,9 +85,12 @@ export function Feedback() {
             </Reveal>
             <Reveal delay={STAGGER.trail}>
               <form onSubmit={handleSubmit} className="mt-10 space-y-5">
+                <input type="hidden" name="_subject" value="KoThok site feedback" />
+                <input type="hidden" name="_template" value="table" />
+                <input type="hidden" name="_captcha" value="false" />
                 <input
-                  type="checkbox"
-                  name="botcheck"
+                  type="text"
+                  name="_honey"
                   className="hidden"
                   tabIndex={-1}
                   autoComplete="off"
@@ -131,6 +136,21 @@ export function Feedback() {
                     placeholder="What's on your mind?"
                     className={`${FIELD} resize-y`}
                   />
+                </div>
+                <div>
+                  <label htmlFor="fb-photo" className={LABEL}>
+                    Photo (optional)
+                  </label>
+                  <p className="mb-1.5 text-sm text-eink-500">Snap the screen if there's a bug to show.</p>
+                  <input
+                    id="fb-photo"
+                    name="attachment"
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhoto}
+                    className={FILE}
+                  />
+                  {photoName && <p className="mt-1.5 text-sm text-kothokgreen">{photoName}</p>}
                 </div>
                 {status === "error" && (
                   <p role="alert" className="rounded-lg bg-kothokred/10 px-4 py-3 text-sm text-kothokred">
