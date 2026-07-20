@@ -2,12 +2,13 @@ import { useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { Reveal, STAGGER } from "../components/Reveal";
 
-const ENDPOINT = "https://formsubmit.co/ajax/kothok@bitops.bd";
+const WEB3FORMS_KEY = "651486d1-94e9-43df-8d78-56b6b47b8e7b";
+const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/ykdvs21g/image/upload";
+const UPLOAD_PRESET = "uaezvf1b";
 const MAX_BYTES = 2 * 1024 * 1024;
 const MAX_DIM = 1920;
 
 type Status = "idle" | "submitting" | "success" | "error";
-type Photo = { blob: Blob; name: string; resized: boolean };
 
 const FIELD =
   "w-full rounded-xl border border-ink/15 bg-paper px-4 py-3 text-base text-ink transition-colors placeholder:text-eink-500/60 focus:border-kothokgreen";
@@ -23,7 +24,7 @@ function formatSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-// Downscale large phone photos so the attachment stays well under email limits.
+// Downscale large phone photos before uploading so it stays fast on mobile data.
 // createImageBitmap with imageOrientation applies the phone's EXIF rotation so
 // the snapshot isn't sideways. Falls back to the original on any failure.
 async function shrinkImage(file: File): Promise<Blob> {
@@ -49,50 +50,83 @@ async function shrinkImage(file: File): Promise<Blob> {
   }
 }
 
+async function uploadToCloudinary(blob: Blob, name: string): Promise<string> {
+  const form = new FormData();
+  form.append("file", blob, name);
+  form.append("upload_preset", UPLOAD_PRESET);
+  const res = await fetch(CLOUDINARY_URL, { method: "POST", body: form });
+  const json = (await res.json()) as { secure_url?: string; error?: { message?: string } };
+  if (!res.ok || !json.secure_url) {
+    throw new Error(json.error?.message || "Upload failed");
+  }
+  return json.secure_url;
+}
+
 export function Feedback() {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
-  const [photo, setPhoto] = useState<Photo | null>(null);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [photoName, setPhotoName] = useState("");
   const [photoBusy, setPhotoBusy] = useState(false);
 
   async function handlePhoto(e: ChangeEvent<HTMLInputElement>) {
     const file = e.currentTarget.files?.[0];
     if (!file) {
-      setPhoto(null);
+      setPhotoUrl(null);
+      setPhotoName("");
       return;
     }
     if (!file.type.startsWith("image/")) {
-      setPhoto(null);
+      setPhotoUrl(null);
+      setPhotoName("");
       setErrorMsg("Please choose an image file.");
       setStatus("error");
       return;
     }
     setPhotoBusy(true);
-    const resized = file.size > MAX_BYTES;
-    const blob = resized ? await shrinkImage(file) : file;
-    setPhotoBusy(false);
-    setPhoto({ blob, name: file.name, resized });
+    setErrorMsg("");
+    setStatus("idle");
+    try {
+      const blob = file.size > MAX_BYTES ? await shrinkImage(file) : file;
+      const url = await uploadToCloudinary(blob, file.name);
+      setPhotoUrl(url);
+      setPhotoName(file.name);
+    } catch {
+      setPhotoUrl(null);
+      setPhotoName("");
+      setErrorMsg("Photo upload failed. Try a smaller image or remove it.");
+      setStatus("error");
+    } finally {
+      setPhotoBusy(false);
+    }
   }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     const data = new FormData(form);
-    if (photo) data.set("attachment", photo.blob, photo.name);
     setStatus("submitting");
     setErrorMsg("");
     try {
-      const res = await fetch(ENDPOINT, {
+      const res = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
-        headers: { Accept: "application/json" },
-        body: data,
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_KEY,
+          subject: "KoThok site feedback",
+          from_name: "KoThok site",
+          name: data.get("name"),
+          email: data.get("email"),
+          message: data.get("message"),
+          ...(photoUrl ? { photo: photoUrl } : {}),
+        }),
       });
-      const json = (await res.json()) as { success?: string | boolean; message?: string };
-      const ok = json.success === true || json.success === "true";
-      if (ok) {
+      const json = (await res.json()) as { success: boolean; message?: string };
+      if (json.success) {
         setStatus("success");
         form.reset();
-        setPhoto(null);
+        setPhotoUrl(null);
+        setPhotoName("");
       } else {
         setStatus("error");
         setErrorMsg(typeof json.message === "string" ? json.message : "Submission failed. Try again.");
@@ -137,17 +171,7 @@ export function Feedback() {
             </Reveal>
             <Reveal delay={STAGGER.trail}>
               <form onSubmit={handleSubmit} className="mt-10 space-y-5">
-                <input type="hidden" name="_subject" value="KoThok site feedback" />
-                <input type="hidden" name="_template" value="table" />
-                <input type="hidden" name="_captcha" value="false" />
-                <input
-                  type="text"
-                  name="_honey"
-                  className="hidden"
-                  tabIndex={-1}
-                  autoComplete="off"
-                  aria-hidden
-                />
+                <input type="checkbox" name="botcheck" className="hidden" tabIndex={-1} autoComplete="off" aria-hidden />
                 <div>
                   <label htmlFor="fb-name" className={LABEL}>
                     Name
@@ -196,19 +220,10 @@ export function Feedback() {
                   <p className="mb-1.5 text-sm text-eink-500">
                     Snap the screen if there's a bug to show. Photos over {formatSize(MAX_BYTES)} are auto-resized.
                   </p>
-                  <input
-                    id="fb-photo"
-                    name="attachment"
-                    type="file"
-                    accept="image/*"
-                    onChange={handlePhoto}
-                    className={FILE}
-                  />
-                  {photoBusy && <p className="mt-1.5 text-sm text-eink-500">Processing photo...</p>}
-                  {photo && !photoBusy && (
-                    <p className="mt-1.5 text-sm text-kothokgreen">
-                      {photo.name} ({formatSize(photo.blob.size)}){photo.resized ? " - resized" : ""}
-                    </p>
+                  <input id="fb-photo" type="file" accept="image/*" onChange={handlePhoto} className={FILE} />
+                  {photoBusy && <p className="mt-1.5 text-sm text-eink-500">Uploading photo...</p>}
+                  {photoUrl && !photoBusy && (
+                    <p className="mt-1.5 break-all text-sm text-kothokgreen">{photoName} - attached</p>
                   )}
                 </div>
                 {status === "error" && (
