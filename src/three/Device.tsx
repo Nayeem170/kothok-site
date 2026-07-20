@@ -166,28 +166,15 @@ export function Device({ theme, reducedMotion }: DeviceProps) {
 
       <mesh position={[0, 0, 0.102]}>
         <planeGeometry args={[SCREEN_W, SCREEN_H]} />
-        {/* Keyed on the texture: three only compiles a map into the shader when
-            the material is built, so swapping `map` in later leaves the panel
-            blank. Remounting the material forces the recompile.
-            Paper-white until the stills land, so it never flashes black. */}
-        <meshStandardMaterial
+        {/* key remount forces the map shader to recompile when the still loads
+            (three only bakes map into the shader at material build). Paper-white
+            until then so it never flashes black. Unlit: an e-ink panel is
+            emissive paper, so a lit material lets scene lights mottle the text;
+            basic shows the capture flat and full-contrast exactly as shot. */}
+        <meshBasicMaterial
           key={screenTex ? screenTex.uuid : "blank"}
           map={screenTex}
-          color="#FCFCFC"
-          roughness={0.9}
           toneMapped={false}
-        />
-      </mesh>
-
-      <mesh position={[0, 0, 0.108]}>
-        <planeGeometry args={[SCREEN_W, SCREEN_H]} />
-        <meshPhysicalMaterial
-          transparent
-          opacity={0.05}
-          roughness={0.15}
-          clearcoat={0.9}
-          clearcoatRoughness={0.2}
-          reflectivity={0.4}
         />
       </mesh>
 
