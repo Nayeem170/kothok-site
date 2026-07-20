@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { Reveal, STAGGER } from "../components/Reveal";
 
-const ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
+const ACCESS_KEY = "28cc7a0f-8527-413c-9693-7b9dd3b35e7e";
 const ENDPOINT = "https://api.web3forms.com/submit";
 
 type Status = "idle" | "submitting" | "success" | "error";
@@ -18,11 +18,6 @@ export function Feedback() {
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!ACCESS_KEY) {
-      setStatus("error");
-      setErrorMsg("Feedback is not configured on this build.");
-      return;
-    }
     const form = e.currentTarget;
     const data = new FormData(form);
     setStatus("submitting");
