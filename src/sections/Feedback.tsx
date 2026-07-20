@@ -3,8 +3,11 @@ import type { ChangeEvent, FormEvent } from "react";
 import { Reveal, STAGGER } from "../components/Reveal";
 
 const ENDPOINT = "https://formsubmit.co/ajax/kothok@bitops.bd";
+const MAX_BYTES = 2 * 1024 * 1024;
+const MAX_DIM = 1920;
 
 type Status = "idle" | "submitting" | "success" | "error";
+type Photo = { blob: Blob; name: string; resized: boolean };
 
 const FIELD =
   "w-full rounded-xl border border-ink/15 bg-paper px-4 py-3 text-base text-ink transition-colors placeholder:text-eink-500/60 focus:border-kothokgreen";
@@ -14,15 +17,68 @@ const LABEL = "mb-1.5 block font-mono text-xs uppercase tracking-[0.14em] text-e
 const FILE =
   "block w-full cursor-pointer text-sm text-eink-500 file:mr-4 file:cursor-pointer file:rounded-full file:border-0 file:bg-ink file:px-5 file:py-2.5 file:font-mono file:text-xs file:uppercase file:tracking-[0.14em] file:text-paper transition-opacity hover:file:opacity-85";
 
+function formatSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+// Downscale large phone photos so the attachment stays well under email limits.
+// createImageBitmap with imageOrientation applies the phone's EXIF rotation so
+// the snapshot isn't sideways. Falls back to the original on any failure.
+async function shrinkImage(file: File): Promise<Blob> {
+  try {
+    const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+    let { width, height } = bitmap;
+    if (width > MAX_DIM || height > MAX_DIM) {
+      const scale = MAX_DIM / Math.max(width, height);
+      width = Math.round(width * scale);
+      height = Math.round(height * scale);
+    }
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return file;
+    ctx.drawImage(bitmap, 0, 0, width, height);
+    bitmap.close();
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.8));
+    return blob ?? file;
+  } catch {
+    return file;
+  }
+}
+
 export function Feedback() {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
-  const [photoName, setPhotoName] = useState("");
+  const [photo, setPhoto] = useState<Photo | null>(null);
+  const [photoBusy, setPhotoBusy] = useState(false);
+
+  async function handlePhoto(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.currentTarget.files?.[0];
+    if (!file) {
+      setPhoto(null);
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      setPhoto(null);
+      setErrorMsg("Please choose an image file.");
+      setStatus("error");
+      return;
+    }
+    setPhotoBusy(true);
+    const resized = file.size > MAX_BYTES;
+    const blob = resized ? await shrinkImage(file) : file;
+    setPhotoBusy(false);
+    setPhoto({ blob, name: file.name, resized });
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     const data = new FormData(form);
+    if (photo) data.set("attachment", photo.blob, photo.name);
     setStatus("submitting");
     setErrorMsg("");
     try {
@@ -36,7 +92,7 @@ export function Feedback() {
       if (ok) {
         setStatus("success");
         form.reset();
-        setPhotoName("");
+        setPhoto(null);
       } else {
         setStatus("error");
         setErrorMsg(typeof json.message === "string" ? json.message : "Submission failed. Try again.");
@@ -45,10 +101,6 @@ export function Feedback() {
       setStatus("error");
       setErrorMsg("Network error. Check your connection and try again.");
     }
-  }
-
-  function handlePhoto(e: ChangeEvent<HTMLInputElement>) {
-    setPhotoName(e.currentTarget.files?.[0]?.name ?? "");
   }
 
   return (
@@ -141,7 +193,9 @@ export function Feedback() {
                   <label htmlFor="fb-photo" className={LABEL}>
                     Photo (optional)
                   </label>
-                  <p className="mb-1.5 text-sm text-eink-500">Snap the screen if there's a bug to show.</p>
+                  <p className="mb-1.5 text-sm text-eink-500">
+                    Snap the screen if there's a bug to show. Photos over {formatSize(MAX_BYTES)} are auto-resized.
+                  </p>
                   <input
                     id="fb-photo"
                     name="attachment"
@@ -150,7 +204,12 @@ export function Feedback() {
                     onChange={handlePhoto}
                     className={FILE}
                   />
-                  {photoName && <p className="mt-1.5 text-sm text-kothokgreen">{photoName}</p>}
+                  {photoBusy && <p className="mt-1.5 text-sm text-eink-500">Processing photo...</p>}
+                  {photo && !photoBusy && (
+                    <p className="mt-1.5 text-sm text-kothokgreen">
+                      {photo.name} ({formatSize(photo.blob.size)}){photo.resized ? " - resized" : ""}
+                    </p>
+                  )}
                 </div>
                 {status === "error" && (
                   <p role="alert" className="rounded-lg bg-kothokred/10 px-4 py-3 text-sm text-kothokred">
@@ -159,7 +218,7 @@ export function Feedback() {
                 )}
                 <button
                   type="submit"
-                  disabled={status === "submitting"}
+                  disabled={status === "submitting" || photoBusy}
                   className="inline-flex items-center gap-2.5 rounded-full bg-ink px-7 py-3.5 font-mono text-sm uppercase tracking-[0.14em] text-paper transition-opacity hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {status === "submitting" ? "Sending..." : "Send feedback"}
