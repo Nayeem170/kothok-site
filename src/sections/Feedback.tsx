@@ -262,6 +262,13 @@ export function Feedback() {
                 >
                   {status === "submitting" ? "Sending..." : "Send feedback"}
                 </button>
+                <p className="text-sm text-eink-500">
+                  By submitting, you agree to our{" "}
+                  <a href="#privacy" className="link-underline text-kothokgreen">
+                    privacy policy
+                  </a>
+                  .
+                </p>
               </form>
             </Reveal>
           </>

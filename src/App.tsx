@@ -4,7 +4,6 @@ import { Logo } from "./components/Logo";
 import { Hero } from "./sections/Hero";
 import { Demo } from "./sections/Demo";
 import { Features } from "./sections/Features";
-import { Controls } from "./sections/Controls";
 import { Compare } from "./sections/Compare";
 import { GetStarted } from "./sections/GetStarted";
 import { Feedback } from "./sections/Feedback";
@@ -167,7 +166,6 @@ export default function App() {
           <Hero theme={theme} reducedMotion={reducedMotion} enhanced={enhanced} />
           <Demo />
           <Features />
-          <Controls />
           <Compare />
           <GetStarted />
           <Feedback />

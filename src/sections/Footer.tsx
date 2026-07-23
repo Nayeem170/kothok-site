@@ -40,6 +40,13 @@ export function Footer() {
               <span>PolyForm-Noncommercial</span>
               <span className="h-3 w-px bg-ink/15" aria-hidden />
               <a
+                href="#privacy"
+                className="link-underline hover:text-ink"
+              >
+                Privacy
+              </a>
+              <span className="h-3 w-px bg-ink/15" aria-hidden />
+              <a
                 href={LINKS.repo.main}
                 target="_blank"
                 rel="noreferrer"

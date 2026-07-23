@@ -21,11 +21,12 @@ export const FEATURES: FeatureCell[] = [
   {
     id: "read-aloud",
     title: "Read aloud",
-    line: "Natural-sounding voices read your book over a Bluetooth speaker.",
+    line: "Natural-sounding voices read your book over a Bluetooth speaker. Control playback with headset buttons or screen gestures.",
     chips: [
-      { label: "Voices", value: "300+ from Edge TTS", tone: "key" },
+      { label: "Voices", value: "300+ Edge TTS", tone: "key" },
+      { label: "Headset", value: "Play/pause/skip", tone: "key" },
+      { label: "Touch", value: "Tap + swipe", tone: "key" },
       { label: "Output", value: "Bluetooth A2DP", tone: "plain" },
-      { label: "Controls", value: "Headset buttons", tone: "key" },
       { label: "Needs", value: "WiFi", tone: "caveat" },
     ],
     state: "readAloud",
@@ -73,7 +74,6 @@ export const FEATURES: FeatureCell[] = [
     chips: [
       { label: "Hands", value: "Free while it reads", tone: "key" },
       { label: "Output", value: "Any Bluetooth speaker", tone: "plain" },
-      { label: "Needs", value: "WiFi", tone: "caveat" },
     ],
     state: "anywhere",
     shot: "05-kitchen",
