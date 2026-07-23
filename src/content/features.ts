@@ -25,6 +25,7 @@ export const FEATURES: FeatureCell[] = [
     chips: [
       { label: "Voices", value: "300+ from Edge TTS", tone: "key" },
       { label: "Output", value: "Bluetooth A2DP", tone: "plain" },
+      { label: "Controls", value: "Headset buttons", tone: "key" },
       { label: "Needs", value: "WiFi", tone: "caveat" },
     ],
     state: "readAloud",

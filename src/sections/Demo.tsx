@@ -31,11 +31,6 @@ export function Demo() {
             />
           </div>
         </Reveal>
-        <Reveal delay={0.2}>
-          <p className="mt-4 text-center text-sm text-eink-500">
-            Video hosted on YouTube. Nothing is sent to Google until you press play.
-          </p>
-        </Reveal>
       </div>
     </section>
   );
