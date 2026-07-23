@@ -1,9 +1,11 @@
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 
+import { cloudflare } from "@cloudflare/vite-plugin";
+
 export default defineConfig({
   base: "./",
-  plugins: [react()],
+  plugins: [react(), cloudflare()],
   build: {
     target: "es2020",
     chunkSizeWarningLimit: 1200,
