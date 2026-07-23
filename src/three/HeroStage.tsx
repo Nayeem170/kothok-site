@@ -36,7 +36,6 @@ function DragRig({ reducedMotion }: { reducedMotion: boolean }) {
       try {
         el.releasePointerCapture(e.pointerId);
       } catch {
-        // best-effort: releasePointerCapture throws if the pointer was already released
       }
     };
     el.addEventListener("pointerdown", onDown);

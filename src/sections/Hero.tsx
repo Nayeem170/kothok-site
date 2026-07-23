@@ -20,7 +20,13 @@ export function Hero({
   reducedMotion: boolean;
   enhanced: boolean;
 }) {
-  const useLive = enhanced && !reducedMotion;
+  // Reduced motion is honoured inside the scene, not by replacing it: DragRig
+  // and Device both freeze their animation on the `reducedMotion` prop, leaving
+  // a still 3D device. Swapping in the poster instead threw away a working
+  // static render, and since Windows "Animation effects = Off" sets
+  // prefers-reduced-motion, a lot of visitors never saw the hero at all. The
+  // poster now means one thing only: this browser cannot do WebGL.
+  const useLive = enhanced;
 
   return (
     <section className="relative min-h-screen overflow-hidden">

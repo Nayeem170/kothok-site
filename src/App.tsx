@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useSyncExternalStore } from "react";
 import type { Theme } from "./three/Device";
 import { Logo } from "./components/Logo";
 import { Hero } from "./sections/Hero";
@@ -7,23 +7,50 @@ import { Compare } from "./sections/Compare";
 import { GetStarted } from "./sections/GetStarted";
 import { Feedback } from "./sections/Feedback";
 import { Footer } from "./sections/Footer";
+import { Privacy } from "./sections/Privacy";
 import { StickyBar } from "./components/StickyBar";
 
-function supportsWebGL(): boolean {
+/// Probe once, then remember. Each probe creates a real WebGL context, and a
+/// browser only allows about 16 live at a time before it starts killing the
+/// oldest - which would eventually be the hero's. So the context is released
+/// immediately and the answer cached for the life of the page.
+let webglSupport: boolean | null = null;
+
+export function supportsWebGL(): boolean {
+  if (webglSupport !== null) return webglSupport;
+  if (typeof window === "undefined") return false;
   try {
     const c = document.createElement("canvas");
-    return !!(
-      window.WebGLRenderingContext &&
-      (c.getContext("webgl") || c.getContext("experimental-webgl"))
-    );
+    // three requests webgl2 first, so probe in the same order it will.
+    const ctx = c.getContext("webgl2") ?? c.getContext("webgl");
+    ctx?.getExtension("WEBGL_lose_context")?.loseContext();
+    webglSupport = !!ctx;
   } catch {
-    return false;
+    webglSupport = false;
   }
+  return webglSupport;
 }
 
-function prefersReducedMotion(): boolean {
-  return (
-    typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
+/// `?force3d` runs the hero fully animated whatever the OS says. The stage
+/// itself no longer depends on prefers-reduced-motion - that only freezes the
+/// animation now - so this exists to check the moving version on a machine
+/// where Windows has animation effects switched off.
+function forced3D(): boolean {
+  if (typeof window === "undefined") return false;
+  return new URLSearchParams(window.location.search).has("force3d");
+}
+
+function subscribeMatchMedia(query: string, callback: () => void): () => void {
+  const mql = window.matchMedia(query);
+  mql.addEventListener("change", callback);
+  return () => mql.removeEventListener("change", callback);
+}
+
+function useMatchMedia(query: string): boolean {
+  return useSyncExternalStore(
+    (cb) => subscribeMatchMedia(query, cb),
+    () => window.matchMedia(query).matches,
+    () => false,
   );
 }
 
@@ -91,13 +118,29 @@ function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void
 }
 
 export default function App() {
-  const enhanced = typeof window !== "undefined" && supportsWebGL();
-  const reducedMotion = typeof window !== "undefined" && prefersReducedMotion();
+  const force3d = forced3D();
+  const reducedMotion = useMatchMedia("(prefers-reduced-motion: reduce)") && !force3d;
+  const enhanced = supportsWebGL() || force3d;
+
+
   const [theme, setTheme] = useState<Theme>(() =>
     typeof document !== "undefined" && document.documentElement.classList.contains("dark")
       ? "dark"
       : "light",
   );
+
+  const [route, setRoute] = useState(
+    typeof window !== "undefined" ? window.location.hash : "",
+  );
+
+  useEffect(() => {
+    const onHash = () => {
+      setRoute(window.location.hash);
+      window.scrollTo(0, 0);
+    };
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
 
   const toggleTheme = () => {
     setTheme((prev) => {
@@ -106,7 +149,6 @@ export default function App() {
       try {
         localStorage.setItem("kothok-theme", next);
       } catch {
-        /* ignore */
       }
       return next;
     });
@@ -116,14 +158,18 @@ export default function App() {
     <div id="top">
       <Nav theme={theme} onToggleTheme={toggleTheme} />
 
-      <main>
-        <Hero theme={theme} reducedMotion={reducedMotion} enhanced={enhanced} />
-        <Features />
-        <Compare />
-        <GetStarted />
-        <Feedback />
-        <Footer />
-      </main>
+      {route === "#privacy" ? (
+        <Privacy />
+      ) : (
+        <main>
+          <Hero theme={theme} reducedMotion={reducedMotion} enhanced={enhanced} />
+          <Features />
+          <Compare />
+          <GetStarted />
+          <Feedback />
+          <Footer />
+        </main>
+      )}
 
       <StickyBar />
     </div>

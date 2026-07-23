@@ -8,10 +8,11 @@ export type Theme = "light" | "dark";
 
 /// Real captures off the device, not a replica. Refresh them by running a
 /// `--features screenshot` build of the reader and holding the header centre.
-const SCREEN_STATES = [
+export const SCREEN_STATES = [
   "splash",
   "library",
   "reading",
+  "reading-bangla",
   "audio",
   "chapters",
   "about",
@@ -37,10 +38,11 @@ const PANEL_H = 1448;
 const SCREEN_H = 2.48;
 const SCREEN_W = SCREEN_H * (PANEL_W / PANEL_H);
 
-const SCREEN_ORDER: { state: ScreenState; dwell: number }[] = [
+export const SCREEN_ORDER: { state: ScreenState; dwell: number }[] = [
   { state: "splash", dwell: 2.4 },
   { state: "library", dwell: 3.6 },
   { state: "reading", dwell: 4.0 },
+  { state: "reading-bangla", dwell: 4.0 },
   { state: "audio", dwell: 4.0 },
   { state: "chapters", dwell: 3.2 },
   { state: "about", dwell: 3.2 },
@@ -96,6 +98,11 @@ function useScreenTextures(maxAniso: number) {
   return textures;
 }
 
+/// The one screen a reduced-motion visitor sees, since the carousel never
+/// advances for them. `reading` rather than `splash`: a still of the splash is
+/// a logo, a still of the reading view shows what the app actually does.
+const STILL_SCREEN_IDX = SCREEN_ORDER.findIndex((s) => s.state === "reading");
+
 const FLASH_DURATION_SEC = 0.4;
 const FLASH_PEAK_OPACITY = 0.4;
 const FLOAT_SPEED = 0.6;
@@ -112,7 +119,7 @@ export function Device({ theme, reducedMotion }: DeviceProps) {
   const group = useRef<THREE.Group>(null);
   const bodyMat = useRef<THREE.MeshStandardMaterial>(null);
   const flashMat = useRef<THREE.MeshBasicMaterial>(null);
-  const activeIdx = useRef(0);
+  const activeIdx = useRef(reducedMotion ? STILL_SCREEN_IDX : 0);
   const cycleStart = useRef(0);
   const flashAt = useRef(-10);
   const [, forceTick] = useState(0);
@@ -129,11 +136,14 @@ export function Device({ theme, reducedMotion }: DeviceProps) {
     const elapsed = t - cycleStart.current;
     const def = SCREEN_ORDER[activeIdx.current];
 
-    if (elapsed >= def.dwell) {
+    // A screen swap is motion too, not just the float and the flash, so the
+    // carousel has to stop entirely - otherwise reduced motion still gets
+    // content changing under it every few seconds.
+    if (!reducedMotion && elapsed >= def.dwell) {
       activeIdx.current = (activeIdx.current + 1) % SCREEN_ORDER.length;
       cycleStart.current = t;
       forceTick((x) => x + 1);
-      if (!reducedMotion) flashAt.current = t;
+      flashAt.current = t;
     }
 
     if (flashMat.current && !reducedMotion) {
