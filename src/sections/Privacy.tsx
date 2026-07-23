@@ -51,6 +51,11 @@ export function Privacy() {
             <li>
               <strong>Google (Gmail)</strong> - stores feedback emails in our inbox.
             </li>
+            <li>
+              <strong>YouTube (Google)</strong> - hosts the demo video on the landing
+              page. The video is not loaded unless you press play, and YouTube's
+              domain uses the privacy-enhanced mode (youtube-nocookie.com).
+            </li>
           </ul>
           <p className="mt-3 leading-relaxed">
             Each provider processes data under their own terms and GDPR data

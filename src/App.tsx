@@ -2,6 +2,7 @@ import { useState, useEffect, useSyncExternalStore } from "react";
 import type { Theme } from "./three/Device";
 import { Logo } from "./components/Logo";
 import { Hero } from "./sections/Hero";
+import { Demo } from "./sections/Demo";
 import { Features } from "./sections/Features";
 import { Compare } from "./sections/Compare";
 import { GetStarted } from "./sections/GetStarted";
@@ -163,6 +164,7 @@ export default function App() {
       ) : (
         <main>
           <Hero theme={theme} reducedMotion={reducedMotion} enhanced={enhanced} />
+          <Demo />
           <Features />
           <Compare />
           <GetStarted />
