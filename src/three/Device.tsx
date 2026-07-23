@@ -98,12 +98,7 @@ function useScreenTextures(maxAniso: number) {
   return textures;
 }
 
-/// The one screen a reduced-motion visitor sees, since the carousel never
-/// advances for them. `reading` rather than `splash`: a still of the splash is
-/// a logo, a still of the reading view shows what the app actually does.
-const STILL_SCREEN_IDX = SCREEN_ORDER.findIndex((s) => s.state === "reading");
-
-const FLASH_DURATION_SEC = 0.4;
+export const FLASH_DURATION_SEC = 0.4;
 const FLASH_PEAK_OPACITY = 0.4;
 const FLOAT_SPEED = 0.6;
 const FLOAT_AMPLITUDE = 0.05;
@@ -119,7 +114,7 @@ export function Device({ theme, reducedMotion }: DeviceProps) {
   const group = useRef<THREE.Group>(null);
   const bodyMat = useRef<THREE.MeshStandardMaterial>(null);
   const flashMat = useRef<THREE.MeshBasicMaterial>(null);
-  const activeIdx = useRef(reducedMotion ? STILL_SCREEN_IDX : 0);
+  const activeIdx = useRef(0);
   const cycleStart = useRef(0);
   const flashAt = useRef(-10);
   const [, forceTick] = useState(0);
@@ -136,10 +131,9 @@ export function Device({ theme, reducedMotion }: DeviceProps) {
     const elapsed = t - cycleStart.current;
     const def = SCREEN_ORDER[activeIdx.current];
 
-    // A screen swap is motion too, not just the float and the flash, so the
-    // carousel has to stop entirely - otherwise reduced motion still gets
-    // content changing under it every few seconds.
-    if (!reducedMotion && elapsed >= def.dwell) {
+    // Screen content cycles regardless of reduced motion - it's information,
+    // not physical motion. Float, sway and flash are gated below.
+    if (elapsed >= def.dwell) {
       activeIdx.current = (activeIdx.current + 1) % SCREEN_ORDER.length;
       cycleStart.current = t;
       forceTick((x) => x + 1);
