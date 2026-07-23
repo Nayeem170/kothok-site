@@ -22,3 +22,9 @@ AGENTS.md
 # public/images are derived from these; the originals stay local so a scene can
 # be re-encoded without being regenerated.
 design-source/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example
