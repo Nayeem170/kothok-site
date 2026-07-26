@@ -1,0 +1,12 @@
+{
+  "repo": {
+    "main": "https://github.com/Nayeem170/KoThok"
+  },
+  "installer": {
+    "page": "https://github.com/Nayeem170/KoThok/tree/main/installer"
+  },
+  "crates": {
+    "koboCore": "https://crates.io/crates/kobo-core",
+    "edgeTts": "https://crates.io/crates/kothok-edge-tts"
+  }
+}
